@@ -13,6 +13,7 @@
         <module>codefocus-cache</module>
         <module>codefocus-okhttp</module>
         <module>codefocus-pay</module>
+        <module>codefocus-rabbit-starter</module>
     </modules>
     <properties>
         <revision>1.0-SNAPSHOT</revision>
