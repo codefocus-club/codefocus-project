@@ -2,6 +2,7 @@
 
 ##环境依赖：
     springcloud 2.1.3.RELEASE 版本
+    
 ###(step 1)使用教程：
      <dependency>
         <groupId>club.codefocus.framework</groupId>
