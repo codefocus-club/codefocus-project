@@ -94,6 +94,16 @@
     }
 
 
+###(step 4)注入MQDynamicHandler 实例：
+
+    @Autowired
+    private MQDynamicHandler mQDynamicHandler;
+    
+    String EXCHANGE="";//交换机名称
+    String routingKey=""://
+    String msg="";//发送消息
+    mQDynamicHandler.publishMsg(EXCHANGE, routingKey,msg);
+    
 ##注意：
  1.DynamicConsumer 需要继承AbsMQConsumerService
  
