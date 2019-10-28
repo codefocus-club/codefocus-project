@@ -1,17 +1,24 @@
-#codefocus-rabbit-starter 基于YML动态配置创建Rabbit
+# codefocus-rabbit-starter 基于YML动态配置创建Rabbit
 
-##环境依赖：
-    springcloud 2.1.3.RELEASE 版本
+## 环境依赖：
+    springboot 2.1.3.RELEASE 版本
     
-###(step 1)使用教程：
-     <dependency>
-        <groupId>club.codefocus.framework</groupId>
-         <artifactId>codefocus-rabbit-starter</artifactId>
-         <version>1.0-SNAPSHOT</version>
-     </dependency>
+### (step 1)使用教程：
+```xml
 
-###(step 2)YML配置详解
-    spring:
+<dependency>
+    <groupId>club.codefocus.framework</groupId>
+    <artifactId>codefocus-rabbit-starter</artifactId>
+    <version>1.0-SNAPSHOT</version>
+ </dependency>
+
+```
+
+### (step 2)YML配置详解
+
+```yaml
+
+spring:
       rabbitmq:
         host: 127.0.0.1
         port: 5672
@@ -68,43 +75,51 @@
              #是否持久化
              durable: true
 
+```
 
-###(step 3)MQ消费Bean实例：
+### (step 3)MQ消费Bean实例：
 
-    package com.example.demo.consumer;
-    
-    import club.codefocus.framework.rabbit.api.AbsMQConsumerService;
-    import com.rabbitmq.client.Channel;
-    import org.springframework.amqp.core.Message;
-    import org.springframework.stereotype.Component;
-    
-    
-    @Component
-    public class DynamicConsumer extends AbsMQConsumerService {
-        volatile int index=1;
-    
-        @Override
-        public boolean process(Message message, Channel channel) {
-            System.out.println(
-                    index+"=============DynamicConsumer[" +  new String(message.getBody()));
-            index++;
-            return true;
-        }
+```java
 
+package com.example.demo.consumer;
+    
+import club.codefocus.framework.rabbit.api.AbsMQConsumerService;
+import com.rabbitmq.client.Channel;
+import org.springframework.amqp.core.Message;
+import org.springframework.stereotype.Component;
+    
+    
+@Component
+public class DynamicConsumer extends AbsMQConsumerService {
+    volatile int index=1;
+
+    @Override
+    public boolean process(Message message, Channel channel) {
+        System.out.println(
+                index+"=============DynamicConsumer[" +  new String(message.getBody()));
+        index++;
+        return true;
     }
 
-
-###(step 4)注入MQDynamicHandler 实例：
-
-    @Autowired
-    private MQDynamicHandler mQDynamicHandler;
+}
+```
     
-    String EXCHANGE="";//交换机名称
-    String routingKey=""://
-    String msg="";//发送消息
-    mQDynamicHandler.publishMsg(EXCHANGE, routingKey,msg);
+
+
+### (step 4)注入MQDynamicHandler 实例：
+
+```java
+@Autowired
+private MQDynamicHandler mQDynamicHandler;
+String EXCHANGE="";//交换机名称
+String routingKey=""://
+String msg="";//发送消息
+mQDynamicHandler.publishMsg(EXCHANGE, routingKey,msg);
+
+```
+
     
-##注意：
+    
+## 注意：
  1.DynamicConsumer 需要继承AbsMQConsumerService
  
-         
