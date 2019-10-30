@@ -1,6 +1,5 @@
 package club.codefocus.framework.redis.config;
 
-import club.codefocus.framework.redis.intereptor.DistributedLockMethodAop;
 import club.codefocus.framework.redis.intereptor.GlobalLimitInterceptor;
 import club.codefocus.framework.redis.intereptor.RequestLimitInterceptor;
 import club.codefocus.framework.redis.limit.CodeFocusRedisProperties;
@@ -55,10 +54,10 @@ public class CodeFocusRedisConfig implements WebMvcConfigurer {
        return new RedisZSetHandler();
    }
 
-   @Bean
+  /* @Bean
    DistributedLockMethodAop distributedLockMethodAop(){
        return new DistributedLockMethodAop();
-   }
+   }*/
 
    @Bean
    RequestLimitInterceptor requestLimitInterceptor(){

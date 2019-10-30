@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -39,6 +40,7 @@ import java.util.concurrent.TimeUnit;
  * @date: 2019/10/25 10:26
  */
 @Aspect
+@Component
 public class DistributedLockMethodAop {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -53,14 +55,13 @@ public class DistributedLockMethodAop {
     RedisTemplate<String, Serializable> limitRedisTemplate;
 
 
-
-    @Pointcut("@annotation(club.codefocus.framework.redis.annotation.DistributedLock)")
-    public void pointcut() {
+    @Pointcut(value = "@annotation(club.codefocus.framework.redis.annotation.DistributedLock)")
+    public void pointcutDistributedLockMethod() {
 
     }
 
-    @Around(value = "pointcut()")
-    public Object doAround(ProceedingJoinPoint pjp, DistributedLock dl) throws Throwable {
+    @Around("pointcutDistributedLockMethod()")
+    public Object doAround(ProceedingJoinPoint pjp) throws Throwable {
         Object retVal = null;
         DistributedLock distributedLock = null;
         String lockName = null;
@@ -77,7 +78,7 @@ public class DistributedLockMethodAop {
         if (distributedLock != null) {
             if (distributedLock.open()) {
                 lockName = getLockName(distributedLock) + pjp.getSignature().getDeclaringTypeName() + "." + pjp.getSignature().getName();
-                RedisReentrantLock lock = new RedisReentrantLock(limitRedisTemplate, lockName, dl.expire());
+                RedisReentrantLock lock = new RedisReentrantLock(limitRedisTemplate, lockName, distributedLock.expire());
                 try {
                     if (lock.tryLock(CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS)) {
                         logger.info("获取分布式锁:{}", lockName);
@@ -85,7 +86,7 @@ public class DistributedLockMethodAop {
                     } else {
                         logger.error("获取分布式锁超时,锁已被占用:{}", lockName);
                         try {
-                            RedisStarterDataView redisStarterDataView= new RedisStarterDataView(RedisStarterExceptionEnum.SERVER_LIMIT_EXCEPTION);
+                            RedisStarterDataView redisStarterDataView= new RedisStarterDataView(RedisStarterExceptionEnum.SERVER_METHOD_LOCKED);
                             response.setContentType("application/json;charset=UTF-8");
                             response.getWriter().print(JSONObject.toJSONString(redisStarterDataView));
                         } catch (IOException e) {
@@ -121,9 +122,8 @@ public class DistributedLockMethodAop {
                 break;
             case UNIQUEID:
                 HttpServletRequest request = sra.getRequest();
-                Map<String, Object> params = WebUtils.getParametersStartingWith(request, "");
-                if (params != null && StringUtils.isNotBlank(distributedLock.field())) {
-                    String uniqueId = MapUtils.getString(params, distributedLock.field());
+                if (StringUtils.isNotBlank(distributedLock.field())) {
+                    String uniqueId = request.getParameter(distributedLock.field());
                     if (StringUtils.isNotBlank(uniqueId)) {
                         stringBuffer.append(uniqueId + ":");
                     }

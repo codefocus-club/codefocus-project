@@ -3,10 +3,9 @@ package club.codefocus.framework.redis.lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
-import org.springframework.data.redis.core.script.RedisScript;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +21,7 @@ import java.util.concurrent.locks.LockSupport;
 @Slf4j
 class RedisLockInternals {
 
-    private RedisTemplate<String, Serializable> redisTemplate;
+    private RedisTemplate redisTemplate;
 
     public RedisLockInternals(RedisTemplate<String, Serializable> redisTemplate, int lockTimeout) {
         this.lockTimeout=lockTimeout;
@@ -36,6 +35,22 @@ class RedisLockInternals {
 
     private int lockTimeout;
 
+
+    //定义获取锁的lua脚本
+    private final static DefaultRedisScript<Long> LOCK_LUA_SCRIPT = new DefaultRedisScript<>(
+            "if redis.call('setnx', KEYS[1], ARGV[1]) == 1 then return redis.call('pexpire', KEYS[1], ARGV[2]) else return 0 end"
+            , Long.class
+    );
+
+
+
+    //定义释放锁的lua脚本
+    private final static DefaultRedisScript<Long> UNLOCK_LUA_SCRIPT = new DefaultRedisScript<>(
+            "if redis.call('get',KEYS[1]) == ARGV[1] then return redis.call('del',KEYS[1]) else return -1 end"
+            , Long.class
+    );
+
+    static final Long LOCK_SUCCESS = 1L;
 
     String tryRedisLock(String lockId, long time, TimeUnit unit) {
         final long startMillis = System.currentTimeMillis();
@@ -54,47 +69,33 @@ class RedisLockInternals {
         return lockValue;
     }
 
-    private String createRedisKey(String lockId) {
+    private String createRedisKey(String key) {
         try {
-            String value = lockId + randomId(1);
-            String luaScript = ""
-                    + "\nlocal r = tonumber(redis.call('SETNX', KEYS[1],ARGV[1]));"
-                    + "\nredis.call('PEXPIRE',KEYS[1],ARGV[2]);"
-                    + "\nreturn r";
-            List<String> keys = new ArrayList<String>();
-            keys.add(lockId);
-            List<String> args = new ArrayList<String>();
-            args.add(value);
-            args.add(lockTimeout + "");
-            RedisScript<Number> redisScript = new DefaultRedisScript(luaScript, Long.class);
-            Number execute = redisTemplate.execute(redisScript, keys, args);
-            if (new Long(1).equals(execute)) {
+            String value = key + randomId(1);
+            //组装lua脚本参数
+            List<String> keys = Arrays.asList(key);
+            //执行脚本
+            Object result = redisTemplate.execute(LOCK_LUA_SCRIPT, keys,value,lockTimeout);
+            log.info("createRedisKey:{};value:{};result:{}",key,value,result);
+            //存储本地变量
+            if(LOCK_SUCCESS.equals(result)) {
                 return value;
             }
         }catch (Exception e){
-            log.error("lockId:{};msg:{}",lockId,e.getMessage());
+            log.error("createRedisKey key:{};msg:{}",key,e.getMessage());
         }
         return null;
     }
 
     void unlockRedisLock(String key, String value) {
         try {
-            String luaScript = ""
-                    + "\nlocal v = redis.call('GET', KEYS[1]);"
-                    + "\nlocal r= 0;"
-                    + "\nif v == ARGV[1] then"
-                    + "\nr =redis.call('DEL',KEYS[1]);"
-                    + "\nend"
-                    + "\nreturn r";
-            List<String> keys = new ArrayList<String>();
-            keys.add(key);
-            List<String> args = new ArrayList<String>();
-            args.add(value);
-            RedisScript<Number> redisScript = new DefaultRedisScript(luaScript, Long.class);
-            redisTemplate.execute(redisScript, keys, args);
-            args.add(value);
+            //组装lua脚本参数
+            List<String> keys = Arrays.asList(key);
+            // 使用lua脚本删除redis中匹配value的key，可以避免由于方法执行时间过长而redis锁自动过期失效的时候误删其他线程的锁
+            redisTemplate.execute(UNLOCK_LUA_SCRIPT, keys, value);
+            log.info("unlockRedisLock:{}",key,value);
         }catch (Exception e){
-            log.error("key:{};msg:{}",key,e.getMessage());
+            log.error("unlockRedisLock key:{};msg:{}",key,e.getMessage());
         }
     }
 

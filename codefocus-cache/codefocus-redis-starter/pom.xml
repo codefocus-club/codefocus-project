@@ -8,6 +8,7 @@
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    <packaging>jar</packaging>
     <modelVersion>4.0.0</modelVersion>
     <name>codefocus-framework :: cache :: redis</name>
     <artifactId>codefocus-redis-starter</artifactId>
