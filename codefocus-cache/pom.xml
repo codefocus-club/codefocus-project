@@ -13,7 +13,7 @@
     <artifactId>codefocus-cache</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>codefocus-redis</module>
+        <module>codefocus-redis-starter</module>
         <module>codefocus-ehcache</module>
     </modules>
 

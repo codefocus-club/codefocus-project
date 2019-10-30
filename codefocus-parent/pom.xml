@@ -34,11 +34,24 @@
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
         <maven-resource-plugin.version>3.0.1</maven-resource-plugin.version>
+        <commons-lang3.version>3.8.1</commons-lang3.version>
+        <commons-collections.version>3.2.2</commons-collections.version>
+        <redis.clients.version>2.9.0</redis.clients.version>
+        <commons-pool2.version>2.6.1</commons-pool2.version>
+        <fastjson.version>1.2.41</fastjson.version>
     </properties>
 
 
     <dependencyManagement>
         <dependencies>
+
+
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
 
             <dependency>
                 <!-- Import dependency management from Spring Boot -->
@@ -54,6 +67,41 @@
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
             </dependency>
+
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>${commons-collections.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>${redis.clients.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-pool2</artifactId>
+                <version>${commons-pool2.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3}</version>
+            </dependency>
+
 
         </dependencies>
     </dependencyManagement>
