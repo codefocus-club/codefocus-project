@@ -16,6 +16,7 @@ public class CodeFocusRedisProperties {
 
     private  int globalLimitPeriodTime;
     private  int globalLimitCount;
+    private boolean globalLimitOpen=false;
 
 }
 

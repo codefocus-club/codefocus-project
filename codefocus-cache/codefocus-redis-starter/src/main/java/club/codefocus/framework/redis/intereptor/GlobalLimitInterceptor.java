@@ -35,20 +35,23 @@ public class GlobalLimitInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
-        if (handler instanceof HandlerMethod) {
-            HandlerMethod handlerMethod = (HandlerMethod) handler;
-            String ip = IpUtils.getIpAddrExt(request);
-            String methodName = handlerMethod.getMethod().getName();
-            if (StringUtils.isNotBlank(ip) && StringUtils.isNotBlank(methodName)) {
-                AccessSpeedLimit accessSpeedLimit = new AccessSpeedLimit(limitRedisTemplate);
-                if (!accessSpeedLimit.tryAccess(ip, redisProperties.getGlobalLimitPeriodTime(), redisProperties.getGlobalLimitCount())) {
-                    try {
-                        RedisStarterDataView redisStarterDataView= new RedisStarterDataView(RedisStarterExceptionEnum.SERVER_LIMIT_EXCEPTION);
-                        response.setContentType("application/json;charset=UTF-8");
-                        response.getWriter().print(JSONObject.toJSONString(redisStarterDataView));
-                    } catch (IOException e) {
+        boolean globalLimitOpen = redisProperties.isGlobalLimitOpen();
+        if(globalLimitOpen){
+            if (handler instanceof HandlerMethod) {
+                HandlerMethod handlerMethod = (HandlerMethod) handler;
+                String ip = IpUtils.getIpAddrExt(request);
+                String methodName = handlerMethod.getMethod().getName();
+                if (StringUtils.isNotBlank(ip) && StringUtils.isNotBlank(methodName)) {
+                    AccessSpeedLimit accessSpeedLimit = new AccessSpeedLimit(limitRedisTemplate);
+                    if (!accessSpeedLimit.tryAccess(ip, redisProperties.getGlobalLimitPeriodTime(), redisProperties.getGlobalLimitCount())) {
+                        try {
+                            RedisStarterDataView redisStarterDataView= new RedisStarterDataView(RedisStarterExceptionEnum.SERVER_LIMIT_EXCEPTION);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().print(JSONObject.toJSONString(redisStarterDataView));
+                        } catch (IOException e) {
+                        }
+                        return false;
                     }
-                    return false;
                 }
             }
         }

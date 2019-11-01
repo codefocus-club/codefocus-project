@@ -1,5 +1,6 @@
 package club.codefocus.framework.redis.config;
 
+import club.codefocus.framework.redis.cacheable.MyRedisCacheManager;
 import club.codefocus.framework.redis.intereptor.GlobalLimitInterceptor;
 import club.codefocus.framework.redis.intereptor.RequestLimitInterceptor;
 import club.codefocus.framework.redis.limit.CodeFocusRedisProperties;
@@ -8,9 +9,14 @@ import club.codefocus.framework.redis.service.RedisStringHandler;
 import club.codefocus.framework.redis.service.RedisZSetHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheWriter;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -19,6 +25,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.Serializable;
+import java.time.Duration;
 
 /**
  * @Auther: jackl
@@ -26,11 +33,11 @@ import java.io.Serializable;
  * @Description:
  */
 @Slf4j
+@EnableCaching  //开启缓存
 @ComponentScan("club.codefocus.framework.redis")
 @Configuration
 @EnableConfigurationProperties(CodeFocusRedisProperties.class)
 public class CodeFocusRedisConfig implements WebMvcConfigurer {
-
 
     @Bean
     public RedisTemplate<String, Serializable> limitRedisTemplate(LettuceConnectionFactory redisConnectionFactory) {
@@ -54,11 +61,6 @@ public class CodeFocusRedisConfig implements WebMvcConfigurer {
        return new RedisZSetHandler();
    }
 
-  /* @Bean
-   DistributedLockMethodAop distributedLockMethodAop(){
-       return new DistributedLockMethodAop();
-   }*/
-
    @Bean
    RequestLimitInterceptor requestLimitInterceptor(){
        return new RequestLimitInterceptor();
@@ -73,4 +75,16 @@ public class CodeFocusRedisConfig implements WebMvcConfigurer {
    GlobalLimitInterceptor globalLimitInterceptor(){
        return new GlobalLimitInterceptor();
    }
+
+    /**
+     * 过期时间：秒
+     */
+    @Bean
+    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+        RedisCacheConfiguration defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofDays(1))
+                .computePrefixWith(cacheName -> "caching:" + cacheName);
+        MyRedisCacheManager redisCacheManager = new MyRedisCacheManager(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory), defaultCacheConfig);
+        return redisCacheManager;
+    }
 }

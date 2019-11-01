@@ -25,4 +25,8 @@ public class ApplicationContextHelper implements ApplicationContextAware {
     public Object getBean(String beanName) {
         return applicationContext != null?applicationContext.getBean(beanName):null;
     }
+    //通过class获取Bean.
+    public static <T> T getBean(Class<T> clazz) {
+        return applicationContext.getBean(clazz);
+    }
 }
