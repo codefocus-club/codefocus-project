@@ -10,10 +10,10 @@
     <version>${revision}</version>
     <modules>
         <module>codefocus-parent</module>
-        <module>codefocus-cache</module>
         <module>codefocus-okhttp</module>
         <module>codefocus-pay</module>
         <module>codefocus-rabbit-starter</module>
+        <module>codefocus-cache</module>
     </modules>
     <properties>
         <revision>1.0-SNAPSHOT</revision>
@@ -57,4 +57,6 @@
             </plugin>
         </plugins>
     </build>
+
+
 </project>

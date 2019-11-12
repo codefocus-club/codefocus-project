@@ -1,1 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=club.codefocus.framework.redis.config.CodeFocusRedisConfig

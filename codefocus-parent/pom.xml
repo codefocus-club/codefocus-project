@@ -35,8 +35,6 @@
         <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
         <maven-resource-plugin.version>3.0.1</maven-resource-plugin.version>
 
-
-
         <commons-lang3.version>3.8.1</commons-lang3.version>
         <commons-collections.version>3.2.2</commons-collections.version>
         <redis.clients.version>2.9.0</redis.clients.version>
