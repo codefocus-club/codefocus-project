@@ -1,6 +1,6 @@
 package club.codefocus.framework.cache.config;
 
-import club.codefocus.framework.cache.cacheable.MyRedisCacheManager;
+
 import club.codefocus.framework.cache.intereptor.GlobalLimitInterceptor;
 import club.codefocus.framework.cache.intereptor.RequestLimitInterceptor;
 import club.codefocus.framework.cache.limit.CodeFocusRedisProperties;
@@ -76,15 +76,15 @@ public class CodeFocusRedisConfig implements WebMvcConfigurer {
        return new GlobalLimitInterceptor();
    }
 
-    /**
-     * 过期时间：秒
-     */
-    @Bean
-    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
-        RedisCacheConfiguration defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofDays(1))
-                .computePrefixWith(cacheName -> "caching:" + cacheName);
-        MyRedisCacheManager redisCacheManager = new MyRedisCacheManager(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory), defaultCacheConfig);
-        return redisCacheManager;
-    }
+//    /**
+//     * 过期时间：秒
+//     */
+//    @Bean
+//    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+//        RedisCacheConfiguration defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig()
+//                .entryTtl(Duration.ofDays(1))
+//                .computePrefixWith(cacheName -> "caching:" + cacheName);
+//        MyRedisCacheManager redisCacheManager = new MyRedisCacheManager(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory), defaultCacheConfig);
+//        return redisCacheManager;
+//    }
 }
