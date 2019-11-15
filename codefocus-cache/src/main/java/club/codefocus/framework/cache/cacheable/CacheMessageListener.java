@@ -15,15 +15,11 @@ import org.springframework.data.redis.connection.MessageListener;
 @Slf4j
 public class CacheMessageListener implements MessageListener {
 
-	RedisHandler redisHandler;
+	private CodeFocusCacheManager codeFocusCacheManager;
 
-	private RedisCaffeineCacheManager redisCaffeineCacheManager;
-
-	public CacheMessageListener(RedisHandler redisHandler,
-								RedisCaffeineCacheManager redisCaffeineCacheManager) {
+	public CacheMessageListener(CodeFocusCacheManager codeFocusCacheManager) {
 		super();
-		this.redisHandler = redisHandler;
-		this.redisCaffeineCacheManager = redisCaffeineCacheManager;
+		this.codeFocusCacheManager = codeFocusCacheManager;
 	}
 
 	@Override
@@ -34,7 +30,7 @@ public class CacheMessageListener implements MessageListener {
 			ObjectMapper objectMapper=new ObjectMapper();
 			CacheMessage cacheMessage = objectMapper.readValue(itemValue ,CacheMessage.class);
 			log.debug("onMessage:{};cacheName:{}",itemValue,cacheMessage.getCacheName());
-			redisCaffeineCacheManager.clearLocal(cacheMessage.getCacheName(), cacheMessage.getKey());
+			codeFocusCacheManager.clearLocal(cacheMessage.getCacheName(), cacheMessage.getKey());
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error(e.getMessage());

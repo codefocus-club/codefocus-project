@@ -2,7 +2,7 @@ package club.codefocus.framework.cache.config;
 
 
 import club.codefocus.framework.cache.cacheable.CacheMessageListener;
-import club.codefocus.framework.cache.cacheable.RedisCaffeineCacheManager;
+import club.codefocus.framework.cache.cacheable.CodeFocusCacheManager;
 import club.codefocus.framework.cache.intereptor.GlobalLimitInterceptor;
 import club.codefocus.framework.cache.intereptor.RequestLimitInterceptor;
 import club.codefocus.framework.cache.properties.CodeFocusRedisProperties;
@@ -53,45 +53,46 @@ public class CodeFocusRedisConfig extends CachingConfigurerSupport implements We
     }
 
 
-   @Bean
-   RedisHandler redisHandler(LettuceConnectionFactory redisConnectionFactory){
-       RedisHandler redisHandler = new RedisHandler();
-       redisHandler.setKeySerializer(new StringRedisSerializer());
-       redisHandler.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-       redisHandler.setHashKeySerializer(new StringRedisSerializer());
-       redisHandler.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
-       redisHandler.setConnectionFactory(redisConnectionFactory);
-       return redisHandler;
-   }
+    @Bean
+    RedisHandler redisHandler(LettuceConnectionFactory redisConnectionFactory) {
+        RedisHandler redisHandler = new RedisHandler();
+        redisHandler.setKeySerializer(new StringRedisSerializer());
+        redisHandler.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        redisHandler.setHashKeySerializer(new StringRedisSerializer());
+        redisHandler.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+        redisHandler.setConnectionFactory(redisConnectionFactory);
+        return redisHandler;
+    }
 
-   @Bean
-   RequestLimitInterceptor requestLimitInterceptor(){
-       return new RequestLimitInterceptor();
-   }
+    @Bean
+    RequestLimitInterceptor requestLimitInterceptor() {
+        return new RequestLimitInterceptor();
+    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(globalLimitInterceptor());
         registry.addInterceptor(requestLimitInterceptor());
     }
-   @Bean
-   GlobalLimitInterceptor globalLimitInterceptor(){
-       return new GlobalLimitInterceptor();
-   }
-
 
     @Bean
-    public RedisCaffeineCacheManager redisCaffeineCacheManager(LettuceConnectionFactory redisConnectionFactory) {
-        return new RedisCaffeineCacheManager(codeFocusRedisProperties, redisHandler(redisConnectionFactory));
+    GlobalLimitInterceptor globalLimitInterceptor() {
+        return new GlobalLimitInterceptor();
     }
 
 
     @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer( RedisHandler redisHandler,
-                                                                       RedisCaffeineCacheManager redisCaffeineCacheManager) {
+    public CodeFocusCacheManager redisCaffeineCacheManager(LettuceConnectionFactory redisConnectionFactory) {
+        return new CodeFocusCacheManager(codeFocusRedisProperties, redisHandler(redisConnectionFactory));
+    }
+
+
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(RedisHandler redisHandler,
+                                                                       CodeFocusCacheManager codeFocusCacheManager) {
         RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
         redisMessageListenerContainer.setConnectionFactory(redisHandler.getConnectionFactory());
-        CacheMessageListener cacheMessageListener = new CacheMessageListener(redisHandler, redisCaffeineCacheManager);
+        CacheMessageListener cacheMessageListener = new CacheMessageListener(codeFocusCacheManager);
         redisMessageListenerContainer.addMessageListener(cacheMessageListener, new ChannelTopic(codeFocusRedisProperties.getCacheConfig().getCacheBaseName()));
         return redisMessageListenerContainer;
     }
@@ -99,6 +100,7 @@ public class CodeFocusRedisConfig extends CachingConfigurerSupport implements We
     /**
      * 自定义缓存key生成策略
      * 使用方法 @Cacheable(keyGenerator="keyGenerator")
+     *
      * @return
      */
     @Bean
@@ -109,7 +111,7 @@ public class CodeFocusRedisConfig extends CachingConfigurerSupport implements We
             sb.append(target.getClass().getName());
             sb.append(method.getName());
             for (Object obj : params) {
-                if(obj!=null){
+                if (obj != null) {
                     sb.append(obj.toString().hashCode());
                 }
             }

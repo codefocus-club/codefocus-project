@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  * @Description:
  */
 @Slf4j
-public class RedisCaffeineCacheManager implements CacheManager {
+public class CodeFocusCacheManager implements CacheManager {
 
 	private ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>();
 
@@ -33,7 +33,7 @@ public class RedisCaffeineCacheManager implements CacheManager {
 	RedisHandler redisHandler;
 
 
-	public RedisCaffeineCacheManager(CodeFocusRedisProperties codeFocusRedisProperties, RedisHandler redisHandler
+	public CodeFocusCacheManager(CodeFocusRedisProperties codeFocusRedisProperties, RedisHandler redisHandler
 									 ) {
 		super();
 		this.codeFocusRedisProperties = codeFocusRedisProperties;
@@ -83,7 +83,7 @@ public class RedisCaffeineCacheManager implements CacheManager {
 		if(cache != null) {
 			return cache;
 		}
-		cache = new RedisCaffeineCache(name,
+		cache = new CodeFocusCache(name,
 				caffeineCache(name,expiration), codeFocusRedisProperties,expiration,redisHandler);
 		log.debug("getCache name:{};expiration:{}",name,expiration);
 		Cache oldCache = cacheMap.putIfAbsent(name, cache);
@@ -117,8 +117,8 @@ public class RedisCaffeineCacheManager implements CacheManager {
 			return ;
 		}
 
-		RedisCaffeineCache redisCaffeineCache = (RedisCaffeineCache) cache;
-		redisCaffeineCache.clearLocal(key);
+		CodeFocusCache codeFocusCache = (CodeFocusCache) cache;
+		codeFocusCache.clearLocal(key);
 	}
 
 }
