@@ -24,7 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @Description:
  */
 @Slf4j
-public class RedisCaffeineCache extends AbstractValueAdaptingCache {
+public class CodeFocusCache extends AbstractValueAdaptingCache {
 
 	private String name;
 
@@ -43,13 +43,13 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
 
 	CodeFocusRedisProperties codeFocusRedisProperties;
 
-	protected RedisCaffeineCache(boolean allowNullValues) {
+	protected CodeFocusCache(boolean allowNullValues) {
 		super(allowNullValues);
 	}
 
 
-	public RedisCaffeineCache(String name, CaffeineCache caffeineCache, CodeFocusRedisProperties codeFocusRedisProperties, long expiration,
-							  RedisHandler redisHandler) {
+	public CodeFocusCache(String name, CaffeineCache caffeineCache, CodeFocusRedisProperties codeFocusRedisProperties, long expiration,
+						  RedisHandler redisHandler) {
 
 		super(codeFocusRedisProperties.getCacheConfig().isCacheNullValues());
 		this.name = name;
