@@ -58,5 +58,51 @@
         </plugins>
     </build>
 
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
+
+    <scm>
+        <connection>scm:git:https://github.com/codefocus-club/codefocus-project.git</connection>
+        <developerConnection>scm:git:https://github.com/codefocus-club/codefocus-project.git</developerConnection>
+        <url>https://github.com/codefocus-club/codefocus-project.git</url>
+    </scm>
+    <developers>
+        <developer>
+            <name>jackl-java</name>
+            <email>jackl@codefocus.club</email>
+            <organization>codefocus-club</organization>
+        </developer>
+        <developer>
+            <name>youdw</name>
+            <email>youdw@codefocus.club</email>
+            <organization>codefocus-club</organization>
+        </developer>
+        <developer>
+            <name>shuyutong</name>
+            <email>shuyutong@codefocus.club</email>
+            <organization>codefocus-club</organization>
+        </developer>
+    </developers>
+
+    <issueManagement>
+        <url>https://github.com/codefocus-club/codefocus-project/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 </project>
