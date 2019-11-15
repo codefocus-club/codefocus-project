@@ -147,7 +147,8 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
 		redisHandler.remove(dataKey);
 		push(this.name, dataKey);
 		caffeineCache.evict(key);
-		String zsetKey = getZsetKey(this.name);
+		String zsetKey = getZsetKey(this.name.split("#")[0]);
+		log.debug("evict zsetKey:{},dataKey:{}",zsetKey,dataKey);
 		redisHandler.opsForList().remove(zsetKey,0,dataKey);
 	}
 
