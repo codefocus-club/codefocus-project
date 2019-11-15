@@ -7,6 +7,7 @@ import club.codefocus.framework.cache.exception.RedisStarterExceptionEnum;
 import club.codefocus.framework.cache.handler.RedisHandler;
 import club.codefocus.framework.cache.util.IpUtils;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -69,7 +70,8 @@ public class RequestLimitInterceptor extends HandlerInterceptorAdapter {
                         try {
                             RedisStarterDataView redisStarterDataView= new RedisStarterDataView(RedisStarterExceptionEnum.RQUESTLIMITEXC_EPTION);
                             response.setContentType("application/json;charset=UTF-8");
-                            response.getWriter().print(JSONObject.toJSONString(redisStarterDataView));
+                            ObjectMapper objectMapper=new ObjectMapper();
+                            response.getWriter().print(objectMapper.writeValueAsString(redisStarterDataView));
                         } catch (IOException e) {
                         }
                         return false;

@@ -5,7 +5,7 @@ import club.codefocus.framework.cache.exception.RedisStarterDataView;
 import club.codefocus.framework.cache.exception.RedisStarterExceptionEnum;
 import club.codefocus.framework.cache.lock.RedisReentrantLock;
 import club.codefocus.framework.cache.util.IpUtils;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -76,14 +76,15 @@ public class DistributedLockMethodAop {
                 RedisReentrantLock lock = new RedisReentrantLock(limitRedisTemplate, lockName, distributedLock.expire());
                 try {
                     if (lock.tryLock(CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS)) {
-                        log.info("获取分布式锁:{}", lockName);
+                        log.debug("获取分布式锁:{}", lockName);
                         retVal = pjp.proceed();
                     } else {
-                        log.error("获取分布式锁超时,锁已被占用:{}", lockName);
+                        log.debug("获取分布式锁超时,锁已被占用:{}", lockName);
                         try {
                             RedisStarterDataView redisStarterDataView= new RedisStarterDataView(RedisStarterExceptionEnum.SERVER_METHOD_LOCKED);
                             response.setContentType("application/json;charset=UTF-8");
-                            response.getWriter().print(JSONObject.toJSONString(redisStarterDataView));
+                            ObjectMapper objectMapper=new ObjectMapper();
+                            response.getWriter().print(objectMapper.writeValueAsString(redisStarterDataView));
                         } catch (IOException e) {
                         }
                     }
@@ -92,7 +93,7 @@ public class DistributedLockMethodAop {
                 } finally {
                     try {
                         lock.unlock();
-                        log.info("释放分布式锁:{}", lockName);
+                        log.debug("释放分布式锁:{}", lockName);
                     } catch (Exception e) {
 
                     }
