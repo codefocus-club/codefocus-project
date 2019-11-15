@@ -4,9 +4,10 @@ import club.codefocus.framework.cache.annotation.RequestLimit;
 import club.codefocus.framework.cache.annotation.RequestLimitType;
 import club.codefocus.framework.cache.exception.RedisStarterDataView;
 import club.codefocus.framework.cache.exception.RedisStarterExceptionEnum;
-import club.codefocus.framework.cache.service.RedisStringHandler;
+import club.codefocus.framework.cache.handler.RedisHandler;
 import club.codefocus.framework.cache.util.IpUtils;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +36,7 @@ public class RequestLimitInterceptor extends HandlerInterceptorAdapter {
     private final String PREFIX_REQUEST_LIMIT = "request.limit";
 
     @Autowired
-    private RedisStringHandler stringRedisHandler;
+    private RedisHandler redisHandler;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -58,24 +59,25 @@ public class RequestLimitInterceptor extends HandlerInterceptorAdapter {
 
                 setLid(requestLimit.clientId(),requestLimit.clientIdRequestLimitType(),request,cacheKey);
 
-                String cacheValue = stringRedisHandler.find(cacheKey);
+                Object cacheValue = redisHandler.find(cacheKey);
                 int limit = requestLimit.limit();
                 int period = requestLimit.period();
                 TimeUnit unit = requestLimit.unit();
-                if (StringUtils.isNotBlank(cacheValue)) {
-                    Long countNum = NumberUtils.toLong(cacheValue);
+                if (cacheValue!=null && StringUtils.isNotBlank(cacheValue.toString())) {
+                    Long countNum = NumberUtils.toLong(cacheValue.toString());
                     if (countNum >= limit) {
-                        stringRedisHandler.increment(cacheKey, period, unit);
+                        redisHandler.increment(cacheKey, period, unit);
                         try {
                             RedisStarterDataView redisStarterDataView= new RedisStarterDataView(RedisStarterExceptionEnum.RQUESTLIMITEXC_EPTION);
                             response.setContentType("application/json;charset=UTF-8");
-                            response.getWriter().print(JSONObject.toJSONString(redisStarterDataView));
+                            ObjectMapper objectMapper=new ObjectMapper();
+                            response.getWriter().print(objectMapper.writeValueAsString(redisStarterDataView));
                         } catch (IOException e) {
                         }
                         return false;
                     }
                 }
-                stringRedisHandler.increment(cacheKey, period, unit);
+                redisHandler.increment(cacheKey, period, unit);
             }
         }
         return true;

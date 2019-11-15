@@ -1,31 +1,31 @@
 package club.codefocus.framework.cache.config;
 
-import club.codefocus.framework.cache.cacheable.MyRedisCacheManager;
+
+import club.codefocus.framework.cache.cacheable.CacheMessageListener;
+import club.codefocus.framework.cache.cacheable.RedisCaffeineCacheManager;
 import club.codefocus.framework.cache.intereptor.GlobalLimitInterceptor;
 import club.codefocus.framework.cache.intereptor.RequestLimitInterceptor;
-import club.codefocus.framework.cache.limit.CodeFocusRedisProperties;
-import club.codefocus.framework.cache.service.RedisLockHandler;
-import club.codefocus.framework.cache.service.RedisStringHandler;
-import club.codefocus.framework.cache.service.RedisZSetHandler;
+import club.codefocus.framework.cache.properties.CodeFocusRedisProperties;
+import club.codefocus.framework.cache.handler.RedisHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.cache.RedisCacheWriter;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.Serializable;
-import java.time.Duration;
 
 /**
  * @Auther: jackl
@@ -37,7 +37,11 @@ import java.time.Duration;
 @ComponentScan("club.codefocus.framework.cache")
 @Configuration
 @EnableConfigurationProperties(CodeFocusRedisProperties.class)
-public class CodeFocusRedisConfig implements WebMvcConfigurer {
+public class CodeFocusRedisConfig extends CachingConfigurerSupport implements WebMvcConfigurer {
+
+
+    @Autowired
+    CodeFocusRedisProperties codeFocusRedisProperties;
 
     @Bean
     public RedisTemplate<String, Serializable> limitRedisTemplate(LettuceConnectionFactory redisConnectionFactory) {
@@ -48,17 +52,16 @@ public class CodeFocusRedisConfig implements WebMvcConfigurer {
         return template;
     }
 
+
    @Bean
-   RedisLockHandler redisLockHandler(){
-       return new RedisLockHandler();
-   }
-   @Bean
-   RedisStringHandler redisStringHandler(){
-       return new RedisStringHandler();
-   }
-   @Bean
-   RedisZSetHandler redisZSetHandler(){
-       return new RedisZSetHandler();
+   RedisHandler redisHandler(LettuceConnectionFactory redisConnectionFactory){
+       RedisHandler redisHandler = new RedisHandler();
+       redisHandler.setKeySerializer(new StringRedisSerializer());
+       redisHandler.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+       redisHandler.setHashKeySerializer(new StringRedisSerializer());
+       redisHandler.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+       redisHandler.setConnectionFactory(redisConnectionFactory);
+       return redisHandler;
    }
 
    @Bean
@@ -76,15 +79,43 @@ public class CodeFocusRedisConfig implements WebMvcConfigurer {
        return new GlobalLimitInterceptor();
    }
 
+
+    @Bean
+    public RedisCaffeineCacheManager redisCaffeineCacheManager(LettuceConnectionFactory redisConnectionFactory) {
+        return new RedisCaffeineCacheManager(codeFocusRedisProperties, redisHandler(redisConnectionFactory));
+    }
+
+
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer( RedisHandler redisHandler,
+                                                                       RedisCaffeineCacheManager redisCaffeineCacheManager) {
+        RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
+        redisMessageListenerContainer.setConnectionFactory(redisHandler.getConnectionFactory());
+        CacheMessageListener cacheMessageListener = new CacheMessageListener(redisHandler, redisCaffeineCacheManager);
+        redisMessageListenerContainer.addMessageListener(cacheMessageListener, new ChannelTopic(codeFocusRedisProperties.getCacheConfig().getCacheBaseName()));
+        return redisMessageListenerContainer;
+    }
+
     /**
-     * 过期时间：秒
+     * 自定义缓存key生成策略
+     * 使用方法 @Cacheable(keyGenerator="keyGenerator")
+     * @return
      */
     @Bean
-    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
-        RedisCacheConfiguration defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofDays(1))
-                .computePrefixWith(cacheName -> "caching:" + cacheName);
-        MyRedisCacheManager redisCacheManager = new MyRedisCacheManager(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory), defaultCacheConfig);
-        return redisCacheManager;
+    @Override
+    public KeyGenerator keyGenerator() {
+        return (target, method, params) -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append(target.getClass().getName());
+            sb.append(method.getName());
+            for (Object obj : params) {
+                if(obj!=null){
+                    sb.append(obj.toString().hashCode());
+                }
+            }
+            return sb.toString();
+        };
     }
+
+
 }

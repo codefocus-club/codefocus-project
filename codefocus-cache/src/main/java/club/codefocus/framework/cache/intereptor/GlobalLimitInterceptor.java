@@ -3,9 +3,9 @@ package club.codefocus.framework.cache.intereptor;
 import club.codefocus.framework.cache.exception.RedisStarterDataView;
 import club.codefocus.framework.cache.exception.RedisStarterExceptionEnum;
 import club.codefocus.framework.cache.limit.AccessSpeedLimit;
-import club.codefocus.framework.cache.limit.CodeFocusRedisProperties;
+import club.codefocus.framework.cache.properties.CodeFocusRedisProperties;
 import club.codefocus.framework.cache.util.IpUtils;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,8 @@ public class GlobalLimitInterceptor extends HandlerInterceptorAdapter {
                         try {
                             RedisStarterDataView redisStarterDataView= new RedisStarterDataView(RedisStarterExceptionEnum.SERVER_LIMIT_EXCEPTION);
                             response.setContentType("application/json;charset=UTF-8");
-                            response.getWriter().print(JSONObject.toJSONString(redisStarterDataView));
+                            ObjectMapper objectMapper=new ObjectMapper();
+                            response.getWriter().print(objectMapper.writeValueAsString(redisStarterDataView));
                         } catch (IOException e) {
                         }
                         return false;
