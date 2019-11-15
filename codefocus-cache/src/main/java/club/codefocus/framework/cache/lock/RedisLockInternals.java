@@ -76,7 +76,7 @@ class RedisLockInternals {
             List<String> keys = Arrays.asList(key);
             //执行脚本
             Object result = redisTemplate.execute(LOCK_LUA_SCRIPT, keys,value,lockTimeout);
-            log.info("createRedisKey:{};value:{};result:{}",key,value,result);
+            log.debug("createRedisKey:{};value:{};result:{}",key,value,result);
             //存储本地变量
             if(LOCK_SUCCESS.equals(result)) {
                 return value;
@@ -93,7 +93,7 @@ class RedisLockInternals {
             List<String> keys = Arrays.asList(key);
             // 使用lua脚本删除redis中匹配value的key，可以避免由于方法执行时间过长而redis锁自动过期失效的时候误删其他线程的锁
             redisTemplate.execute(UNLOCK_LUA_SCRIPT, keys, value);
-            log.info("unlockRedisLock:{}",key,value);
+            log.debug("unlockRedisLock:{}",key,value);
         }catch (Exception e){
             log.error("unlockRedisLock key:{};msg:{}",key,e.getMessage());
         }

@@ -1,12 +1,14 @@
 package club.codefocus.framework.cache.cacheable;
 
-import club.codefocus.framework.cache.properties.CodeFocusRedisProperties;
 import club.codefocus.framework.cache.handler.RedisHandler;
+import club.codefocus.framework.cache.properties.CodeFocusRedisProperties;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCache;
+import org.springframework.data.redis.core.TimeoutUtils;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,14 +42,40 @@ public class RedisCaffeineCacheManager implements CacheManager {
 	}
 
 
+	/**
+	 *
+	 * @param name   key#100s/m/h/d
+	 * @return
+	 */
 	@Override
 	public Cache getCache(String name) {
 		long expiration=0;
 		if(name.contains("#")){
 			String[] split = name.split("#");
 			if(split.length>1){
-				name=split[0];
-				expiration=Long.valueOf(split[1]);
+				try{
+					String value = split[1];
+					expiration=Integer.parseInt(value.replaceAll("[^0-9]",""));
+					String unitStr = value.replaceAll("[^a-zA-z]","");
+					log.debug("getCache unistr:{};expiration:{};value:{}",unitStr,expiration,value);
+					TimeUnit unit=TimeUnit.SECONDS;
+					if(!StringUtils.isEmpty(unitStr)){
+						unitStr=unitStr.toLowerCase();
+						if(unitStr.equals("s")){
+							unit=TimeUnit.SECONDS;
+						}else if(unitStr.equals("m")){
+							unit=TimeUnit.MINUTES;
+						}else if(unitStr.equals("h")){
+							unit=TimeUnit.HOURS;
+						}else if(unitStr.equals("d")){
+							unit=TimeUnit.DAYS;
+						}
+					}
+					expiration=TimeoutUtils.toSeconds(expiration, unit);
+					log.debug("getCache unistr:{};expiration:{};value:{}",unitStr,expiration,value);
+				}catch (Exception e){
+					log.error(e.getMessage());
+				}
 			}
 		}
 		Cache cache = cacheMap.get(name);
@@ -56,6 +84,7 @@ public class RedisCaffeineCacheManager implements CacheManager {
 		}
 		cache = new RedisCaffeineCache(name,
 				caffeineCache(name,expiration), codeFocusRedisProperties,expiration,redisHandler);
+		log.debug("getCache name:{};expiration:{}",name,expiration);
 		Cache oldCache = cacheMap.putIfAbsent(name, cache);
 		return oldCache == null ? cache : oldCache;
 	}
@@ -90,4 +119,5 @@ public class RedisCaffeineCacheManager implements CacheManager {
 		RedisCaffeineCache redisCaffeineCache = (RedisCaffeineCache) cache;
 		redisCaffeineCache.clearLocal(key);
 	}
+
 }

@@ -6,6 +6,7 @@ import club.codefocus.framework.cache.exception.RedisStarterExceptionEnum;
 import club.codefocus.framework.cache.lock.RedisReentrantLock;
 import club.codefocus.framework.cache.util.IpUtils;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -13,8 +14,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -36,11 +35,10 @@ import java.util.concurrent.TimeUnit;
  * @author: jackl
  * @date: 2019/10/25 10:26
  */
+@Slf4j
 @Aspect
 @Component
 public class DistributedLockMethodAop {
-
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final static Long CONNECTION_TIMEOUT = 3000L;
 
@@ -78,10 +76,10 @@ public class DistributedLockMethodAop {
                 RedisReentrantLock lock = new RedisReentrantLock(limitRedisTemplate, lockName, distributedLock.expire());
                 try {
                     if (lock.tryLock(CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS)) {
-                        logger.info("获取分布式锁:{}", lockName);
+                        log.info("获取分布式锁:{}", lockName);
                         retVal = pjp.proceed();
                     } else {
-                        logger.error("获取分布式锁超时,锁已被占用:{}", lockName);
+                        log.error("获取分布式锁超时,锁已被占用:{}", lockName);
                         try {
                             RedisStarterDataView redisStarterDataView= new RedisStarterDataView(RedisStarterExceptionEnum.SERVER_METHOD_LOCKED);
                             response.setContentType("application/json;charset=UTF-8");
@@ -94,7 +92,7 @@ public class DistributedLockMethodAop {
                 } finally {
                     try {
                         lock.unlock();
-                        logger.info("释放分布式锁:{}", lockName);
+                        log.info("释放分布式锁:{}", lockName);
                     } catch (Exception e) {
 
                     }

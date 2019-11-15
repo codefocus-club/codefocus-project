@@ -33,7 +33,7 @@ public class CacheMessageListener implements MessageListener {
 		try {
 			ObjectMapper objectMapper=new ObjectMapper();
 			CacheMessage cacheMessage = objectMapper.readValue(itemValue ,CacheMessage.class);
-			log.info("onMessage:{};cacheName:{}",itemValue,cacheMessage.getCacheName());
+			log.debug("onMessage:{};cacheName:{}",itemValue,cacheMessage.getCacheName());
 			redisCaffeineCacheManager.clearLocal(cacheMessage.getCacheName(), cacheMessage.getKey());
 		} catch (Exception e) {
 			e.printStackTrace();
