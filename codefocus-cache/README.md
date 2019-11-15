@@ -71,7 +71,7 @@ spring:
     
 
     @Resource
-    RedisStringHandler redisStringHandler;
+    RedisObjectHandler redisObjectHandler;
     
         put(K key, V entity) ;
         

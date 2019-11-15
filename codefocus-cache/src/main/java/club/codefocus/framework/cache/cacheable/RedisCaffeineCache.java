@@ -1,60 +1,63 @@
 package club.codefocus.framework.cache.cacheable;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import club.codefocus.framework.cache.handler.RedisHandler;
+import club.codefocus.framework.cache.json.JSONException;
+import club.codefocus.framework.cache.json.JSONObject;
+import club.codefocus.framework.cache.properties.CodeFocusRedisProperties;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.util.StringUtils;
-import club.codefocus.framework.cache.properties.CacheRedisCaffeineProperties;
+import org.springframework.cache.support.SimpleValueWrapper;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * @author fuwei.deng
- * @date 2018年1月26日 下午5:24:11
- * @version 1.0.0
+ * @Auther: jackl
+ * @Date: 2019/11/13 13:10
+ * @Description:
  */
+@Slf4j
 public class RedisCaffeineCache extends AbstractValueAdaptingCache {
-
-	private final Logger logger = LoggerFactory.getLogger(RedisCaffeineCache.class);
 
 	private String name;
 
-	private RedisTemplate<Object, Object> stringKeyRedisTemplate;
+	RedisHandler redisHandler;
 
-	private Cache<Object, Object> caffeineCache;
+	private CaffeineCache caffeineCache;
 
 	private String cachePrefix;
 
-	private long defaultExpiration = 0;
+	private long expiration = 0;
 
-	private Map<String, Long> expires;
-
-	private String topic = "cache:redis:caffeine:topic";
+	private String topic;
 
 	private Map<String, ReentrantLock> keyLockMap = new ConcurrentHashMap<String, ReentrantLock>();
+
 
 	protected RedisCaffeineCache(boolean allowNullValues) {
 		super(allowNullValues);
 	}
 
-	public RedisCaffeineCache(String name, RedisTemplate<Object, Object> stringKeyRedisTemplate,
-			Cache<Object, Object> caffeineCache, CacheRedisCaffeineProperties cacheRedisCaffeineProperties) {
-		super(cacheRedisCaffeineProperties.isCacheNullValues());
+
+	public RedisCaffeineCache(String name, CaffeineCache caffeineCache, CodeFocusRedisProperties codeFocusRedisProperties, long expiration,
+							  RedisHandler redisHandler) {
+
+		super(codeFocusRedisProperties.getCacheConfig().isCacheNullValues());
 		this.name = name;
-		this.stringKeyRedisTemplate = stringKeyRedisTemplate;
 		this.caffeineCache = caffeineCache;
-		this.cachePrefix = cacheRedisCaffeineProperties.getCachePrefix();
-		this.defaultExpiration = cacheRedisCaffeineProperties.getRedis().getDefaultExpiration();
-		this.expires = cacheRedisCaffeineProperties.getRedis().getExpires();
-		this.topic = cacheRedisCaffeineProperties.getRedis().getTopic();
+		this.cachePrefix = codeFocusRedisProperties.getCacheConfig().getCacheBaseName();
+		this.expiration = expiration;
+		this.topic=codeFocusRedisProperties.getCacheConfig().getCacheBaseName();
+		this.redisHandler=redisHandler;
 	}
+
 
 	@Override
 	public String getName() {
@@ -69,14 +72,13 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T get(Object key, Callable<T> valueLoader) {
+		log.info("get;key：{}",key);
 		Object value = lookup(key);
 		if(value != null) {
 			return (T) value;
 		}
-
-		ReentrantLock lock = keyLockMap.get(key.toString());
+		ReentrantLock lock = keyLockMap.get(key);
 		if(lock == null) {
-			logger.debug("create lock for key : {}", key);
 			lock = new ReentrantLock();
 			keyLockMap.putIfAbsent(key.toString(), lock);
 		}
@@ -99,120 +101,171 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
 
 	@Override
 	public void put(Object key, Object value) {
+		log.info("put; key:{};value:{}", key,value);
 		if (!super.isAllowNullValues() && value == null) {
 			this.evict(key);
             return;
         }
-		long expire = getExpire();
-		if(expire > 0) {
-			stringKeyRedisTemplate.opsForValue().set(getKey(key), toStoreValue(value), expire, TimeUnit.MILLISECONDS);
-		} else {
-			stringKeyRedisTemplate.opsForValue().set(getKey(key), toStoreValue(value));
-		}
+		String dataKey = getKey(key).toString();
+		String dataValue = toStoreValue(value).toString();
+		add(this.name,dataKey,dataKey,dataValue);
 
-		push(new CacheMessage(this.name, key));
+		push(this.name, getKey(key).toString());
 
-		caffeineCache.put(key, value);
+		caffeineCache.put(key, toStoreValue(value));
 	}
 
 	@Override
 	public ValueWrapper putIfAbsent(Object key, Object value) {
+		log.info("putIfAbsent; key:{},value:{}",key,value);
 		Object cacheKey = getKey(key);
 		Object prevValue = null;
 		// 考虑使用分布式锁，或者将redis的setIfAbsent改为原子性操作
 		synchronized (key) {
-			prevValue = stringKeyRedisTemplate.opsForValue().get(cacheKey);
+			prevValue = redisHandler.find(cacheKey.toString());
 			if(prevValue == null) {
-				long expire = getExpire();
-				if(expire > 0) {
-					stringKeyRedisTemplate.opsForValue().set(getKey(key), toStoreValue(value), expire, TimeUnit.MILLISECONDS);
-				} else {
-					stringKeyRedisTemplate.opsForValue().set(getKey(key), toStoreValue(value));
-				}
-
-				push(new CacheMessage(this.name, key));
-
+				String dataKey = getKey(key).toString();
+				String dataValue = toStoreValue(value).toString();
+				add(this.name,dataKey,dataKey,dataValue);
+				push(this.name, dataKey);
 				caffeineCache.put(key, toStoreValue(value));
 			}
 		}
 		return toValueWrapper(prevValue);
 	}
 
+
 	@Override
 	public void evict(Object key) {
+		log.info("evict; key:{}",key);
 		// 先清除redis中缓存数据，然后清除caffeine中的缓存，避免短时间内如果先清除caffeine缓存后其他请求会再从redis里加载到caffeine中
-		stringKeyRedisTemplate.delete(getKey(key));
-
-		push(new CacheMessage(this.name, key));
-
-		caffeineCache.invalidate(key);
+		String dataKey = getKey(key).toString();
+		redisHandler.remove(dataKey);
+		push(this.name, dataKey);
+		caffeineCache.evict(key);
+		String zsetKey = getZsetKey(this.name);
+		redisHandler.opsForList().remove(zsetKey,0,dataKey);
 	}
 
 	@Override
 	public void clear() {
-		// 先清除redis中缓存数据，然后清除caffeine中的缓存，避免短时间内如果先清除caffeine缓存后其他请求会再从redis里加载到caffeine中
-		Set<Object> keys = stringKeyRedisTemplate.keys(this.name.concat(":*"));
-		for(Object key : keys) {
-			stringKeyRedisTemplate.delete(key);
-		}
-
-		push(new CacheMessage(this.name, null));
-
-		caffeineCache.invalidateAll();
+		log.info("clear; name:{}",name);
+		push(this.name, null);
+		caffeineCache.clear();
+		clearRedisData(name);
 	}
 
 	@Override
 	protected Object lookup(Object key) {
-		Object cacheKey = getKey(key);
-		Object value = caffeineCache.getIfPresent(key);
-		if(value != null) {
-			logger.debug("get cache from caffeine, the key is : {}", cacheKey);
-			return value;
+		log.info(" lookup; key:{};name:{}",key,name);
+		Object value=null;
+		try{
+			value = caffeineCache.get(key);
+			if(( value instanceof SimpleValueWrapper)){
+				value=((SimpleValueWrapper) value).get();
+			}
+			if(value != null) {
+				return value;
+			}
+		}catch (Exception e){
+			log.error(e.getMessage());
 		}
-
-		value = stringKeyRedisTemplate.opsForValue().get(cacheKey);
-
+		Object cacheKey = getKey(key);
+		value=redisHandler.find(cacheKey.toString());
+		log.info("lookup; cacheKey:{},value:{}",cacheKey,value);
 		if(value != null) {
-			logger.debug("get cache from redis and put in caffeine, the key is : {}", cacheKey);
 			caffeineCache.put(key, value);
 		}
 		return value;
 	}
 
 	private Object getKey(Object key) {
-		return this.name.concat(":").concat(StringUtils.isEmpty(cachePrefix) ? key.toString() : cachePrefix.concat(":").concat(key.toString()));
-	}
-
-	private long getExpire() {
-		long expire = defaultExpiration;
-		Long cacheNameExpire = expires.get(this.name);
-		return cacheNameExpire == null ? expire : cacheNameExpire.longValue();
+		return cachePrefix.concat(":").concat(name+":").concat(key.toString()).concat(":");
 	}
 
 	/**
-	 * @description 缓存变更时通知其他节点清理本地缓存
-	 * @author fuwei.deng
-	 * @date 2018年1月31日 下午3:20:28
-	 * @version 1.0.0
-	 * @param message
+	 * 缓存变更时通知其他节点清理本地缓存
 	 */
-	private void push(CacheMessage message) {
-		stringKeyRedisTemplate.convertAndSend(topic, message);
+	private void push(String name, String dataKey) {
+		try {
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("cacheName",name);
+			jsonObject.put("key",dataKey);
+			redisHandler.convertAndSend(topic,jsonObject.toString());
+		} catch (JSONException e) {
+			log.error(e.getMessage());
+		}
 	}
 
 	/**
-	 * @description 清理本地缓存
-	 * @author fuwei.deng
-	 * @date 2018年1月31日 下午3:15:39
-	 * @version 1.0.0
+	 * 清理本地缓存
 	 * @param key
 	 */
 	public void clearLocal(Object key) {
-		logger.debug("clear local cache, the key is : {}", key);
+		log.info("clearLocal  key:{}", key);
 		if(key == null) {
-			caffeineCache.invalidateAll();
+			caffeineCache.clear();
 		} else {
-			caffeineCache.invalidate(key);
+			caffeineCache.evict(key);
 		}
+	}
+	String getZsetKey(String name){
+		return cachePrefix.concat(":").concat(name);
+	}
+
+	/**
+	 * 添加缓存redis
+	 * @param key
+	 * @param value
+	 * @param dataKey
+	 * @param dataValue
+	 */
+	public void add(String key, Object value,String dataKey,String dataValue) {
+		StringBuilder sbu=new StringBuilder();
+		sbu.append("redis.call('set',KEYS[1],ARGV[1]);");
+		sbu.append("redis.call('expire', KEYS[1], ARGV[2]);");
+		String zsetKey = getZsetKey(key);
+		sbu.append("redis.call('lpush',KEYS[2],ARGV[3]);");
+		sbu.append("redis.call('expire', KEYS[2], ARGV[4])");
+		DefaultRedisScript LOCK_LUA_SCRIPT = new DefaultRedisScript<>(sbu.toString());
+		List<String> keys =new ArrayList<>();
+		keys.add(dataKey);
+		keys.add(zsetKey);
+		if(expiration==0){
+			expiration=900;
+		}
+		redisHandler.execute(LOCK_LUA_SCRIPT,keys,dataValue,expiration,String.valueOf(value),expiration);
+
+	}
+
+	/**
+	 * 清空redis
+	 * @param key
+	 */
+	public void clearRedisData(String key){
+		String zsetKey = getZsetKey(key);
+		List dataKey = redisHandler.opsForList().range(zsetKey, 0, -1);
+		int index=1;
+		List<Object> keys =new ArrayList<>();
+		StringBuilder sbu=new StringBuilder();
+		String delKeys="";
+		for(int i=0;i<dataKey.size();i++){
+			String delKey = "KEYS[" + index + "]";
+			if(StringUtils.isEmpty(delKeys)){
+				delKeys= delKey;
+			}else{
+				delKeys=delKeys+","+delKey;
+			}
+			index++;
+			keys.add(dataKey.get(i));
+		}
+		if(!StringUtils.isEmpty(delKeys)){
+			sbu.append("redis.call('del',"+delKeys+");");
+		}
+		sbu.append("redis.call('ltrim',KEYS["+(index)+"],1,0);");
+		DefaultRedisScript LOCK_LUA_SCRIPT = new DefaultRedisScript<>(sbu.toString());
+		keys.add(zsetKey);
+		log.info("clearRedisData keys:{},zsetKey:{}",keys.size(),sbu.toString());
+		redisHandler.execute(LOCK_LUA_SCRIPT,keys);
 	}
 }

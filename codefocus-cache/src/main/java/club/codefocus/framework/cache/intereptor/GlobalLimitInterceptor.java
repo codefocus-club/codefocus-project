@@ -3,7 +3,7 @@ package club.codefocus.framework.cache.intereptor;
 import club.codefocus.framework.cache.exception.RedisStarterDataView;
 import club.codefocus.framework.cache.exception.RedisStarterExceptionEnum;
 import club.codefocus.framework.cache.limit.AccessSpeedLimit;
-import club.codefocus.framework.cache.limit.CodeFocusRedisProperties;
+import club.codefocus.framework.cache.properties.CodeFocusRedisProperties;
 import club.codefocus.framework.cache.util.IpUtils;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;

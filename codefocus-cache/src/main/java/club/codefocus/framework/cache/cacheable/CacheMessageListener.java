@@ -1,36 +1,45 @@
 package club.codefocus.framework.cache.cacheable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import club.codefocus.framework.cache.handler.RedisHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.core.RedisTemplate;
+
 
 /**
- * @author fuwei.deng
- * @date 2018年1月30日 下午5:22:33
- * @version 1.0.0
+ * @Auther: jackl
+ * @Date: 2019/11/13 13:10
+ * @Description:
  */
+@Slf4j
 public class CacheMessageListener implements MessageListener {
 
-	private final Logger logger = LoggerFactory.getLogger(CacheMessageListener.class);
-
-	private RedisTemplate<Object, Object> redisTemplate;
+	RedisHandler redisHandler;
 
 	private RedisCaffeineCacheManager redisCaffeineCacheManager;
 
-	public CacheMessageListener(RedisTemplate<Object, Object> redisTemplate,
-                                RedisCaffeineCacheManager redisCaffeineCacheManager) {
+	public CacheMessageListener(RedisHandler redisHandler,
+								RedisCaffeineCacheManager redisCaffeineCacheManager) {
 		super();
-		this.redisTemplate = redisTemplate;
+		this.redisHandler = redisHandler;
 		this.redisCaffeineCacheManager = redisCaffeineCacheManager;
 	}
 
 	@Override
 	public void onMessage(Message message, byte[] pattern) {
-		CacheMessage cacheMessage = (CacheMessage) redisTemplate.getValueSerializer().deserialize(message.getBody());
-		logger.debug("recevice a redis topic message, clear local cache, the cacheName is {}, the key is {}", cacheMessage.getCacheName(), cacheMessage.getKey());
-		redisCaffeineCacheManager.clearLocal(cacheMessage.getCacheName(), cacheMessage.getKey());
+		byte[] body = message.getBody();//请使用valueSerializer
+		String itemValue = new String(body);
+		try {
+			ObjectMapper objectMapper=new ObjectMapper();
+			CacheMessage cacheMessage = objectMapper.readValue(itemValue ,CacheMessage.class);
+			log.info("onMessage:{};cacheName:{}",itemValue,cacheMessage.getCacheName());
+			redisCaffeineCacheManager.clearLocal(cacheMessage.getCacheName(), cacheMessage.getKey());
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error(e.getMessage());
+		}
 	}
+
 
 }

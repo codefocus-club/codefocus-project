@@ -1,12 +1,17 @@
 package club.codefocus.framework.cache.cacheable;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
+
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
- * @author fuwei.deng
- * @date 2018年1月29日 下午1:31:17
- * @version 1.0.0
+ * @Auther: jackl
+ * @Date: 2019/11/13 13:10
+ * @Description:
  */
+@Data
 public class CacheMessage implements Serializable {
 
 	/** */
@@ -14,28 +19,21 @@ public class CacheMessage implements Serializable {
 
 	private String cacheName;
 
-	private Object key;
+	private String key;
 
-	public CacheMessage(String cacheName, Object key) {
-		super();
-		this.cacheName = cacheName;
-		this.key = key;
+	public CacheMessage(){
 	}
 
-	public String getCacheName() {
-		return cacheName;
+
+	public CacheMessage(String json) {
+		try {
+			CacheMessage param = new ObjectMapper().readValue(json, CacheMessage.class);
+			this.cacheName=param.getCacheName();
+			this.key=param.getKey();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public void setCacheName(String cacheName) {
-		this.cacheName = cacheName;
-	}
-
-	public Object getKey() {
-		return key;
-	}
-
-	public void setKey(Object key) {
-		this.key = key;
-	}
 
 }
