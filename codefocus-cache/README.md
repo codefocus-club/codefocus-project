@@ -43,7 +43,7 @@ spring:
 ### (step 3)Bean实例详解：
 
     @Resource
-    RedisLockHandler redisLockHandler;
+    RedisHandler redisHandler;
     
         /**
          * 获取锁
@@ -68,23 +68,6 @@ spring:
          */
         public void unlock(String key)
     
-    
-
-    @Resource
-    RedisObjectHandler redisObjectHandler;
-    
-        put(K key, V entity) ;
-        
-        put(K key, V entity, long timeout);#单位分钟
-        
-        put(K key, V entity, long timeout, TimeUnit unit);自定义
-        
-        V find(K key);#获取或者查找
-        
-        remove(K key);
-        
-        void increment(K key, long timeout, TimeUnit unit);
-        
   
 ### (step 4)注解详解：
 
@@ -176,8 +159,12 @@ spring:
     
 ##Spring Cacheable 添加过期时间
         
-    @Cacheable(value = "UserInfoList#30" ,key = "targetClass + methodName +#p0")
+    @Cacheable(value = "UserInfoList#30s" ,key = "#p0")
             UserInfoList:
-            30:单位秒
+            30s
+            s:秒
+            m:分钟
+            h：小时
+            d：天
 
 
