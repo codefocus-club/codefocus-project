@@ -112,7 +112,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
 
 		push(this.name, getKey(key).toString());
 
-		caffeineCache.put(key, toStoreValue(value));
+		caffeineCache.put(dataKey, toStoreValue(value));
 	}
 
 	@Override
@@ -128,7 +128,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
 				String dataValue = toStoreValue(value).toString();
 				add(this.name,dataKey,dataKey,dataValue);
 				push(this.name, dataKey);
-				caffeineCache.put(key, toStoreValue(value));
+				caffeineCache.put(cacheKey, toStoreValue(value));
 			}
 		}
 		return toValueWrapper(prevValue);
@@ -159,6 +159,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
 	protected Object lookup(Object key) {
 		log.info(" lookup; key:{};name:{}",key,name);
 		Object value=null;
+		Object cacheKey = getKey(key);
 		try{
 			value = caffeineCache.get(key);
 			if(( value instanceof SimpleValueWrapper)){
@@ -170,11 +171,10 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
 		}catch (Exception e){
 			log.error(e.getMessage());
 		}
-		Object cacheKey = getKey(key);
 		value=redisHandler.find(cacheKey.toString());
 		log.info("lookup; cacheKey:{},value:{}",cacheKey,value);
 		if(value != null) {
-			caffeineCache.put(key, value);
+			caffeineCache.put(cacheKey, value);
 		}
 		return value;
 	}
@@ -202,7 +202,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
 	 * @param key
 	 */
 	public void clearLocal(Object key) {
-		log.info("clearLocal  key:{}", key);
+		log.info("clearLocal  key:{};caffeineCache:{}", key,caffeineCache);
 		if(key == null) {
 			caffeineCache.clear();
 		} else {
