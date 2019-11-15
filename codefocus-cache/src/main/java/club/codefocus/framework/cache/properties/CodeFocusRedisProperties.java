@@ -34,6 +34,8 @@ public class CodeFocusRedisProperties {
 
         Caffeine caffeine=new Caffeine();
 
+        private String splitCode="#";
+
         @Data
         public class Caffeine{
             /** 初始化大小*/

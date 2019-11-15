@@ -41,6 +41,8 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
 	private Map<String, ReentrantLock> keyLockMap = new ConcurrentHashMap<String, ReentrantLock>();
 
 
+	CodeFocusRedisProperties codeFocusRedisProperties;
+
 	protected RedisCaffeineCache(boolean allowNullValues) {
 		super(allowNullValues);
 	}
@@ -56,6 +58,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
 		this.expiration = expiration;
 		this.topic=codeFocusRedisProperties.getCacheConfig().getCacheBaseName();
 		this.redisHandler=redisHandler;
+		this.codeFocusRedisProperties=codeFocusRedisProperties;
 	}
 
 
@@ -147,7 +150,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
 		redisHandler.remove(dataKey);
 		push(this.name, dataKey);
 		caffeineCache.evict(key);
-		String zsetKey = getZsetKey(this.name.split("#")[0]);
+		String zsetKey = getZsetKey(this.name.split(codeFocusRedisProperties.getCacheConfig().getSplitCode())[0]);
 		log.debug("evict zsetKey:{},dataKey:{}",zsetKey,dataKey);
 		redisHandler.opsForList().remove(zsetKey,0,dataKey);
 	}
@@ -232,7 +235,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
 	 */
 	public void addCache(String key, Object value, String dataKey, String dataValue) {
 
-		key=key.split("#")[0];
+		key=key.split(codeFocusRedisProperties.getCacheConfig().getSplitCode())[0];
 
 		StringBuilder sbu=new StringBuilder();
 		sbu.append("redis.call('set',KEYS[1],ARGV[1]);");
@@ -260,7 +263,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
 	 * @param key
 	 */
 	public void clearRedisData(String key){
-		key=key.split("#")[0];
+		key=key.split(codeFocusRedisProperties.getCacheConfig().getSplitCode())[0];
 		String zsetKey = getZsetKey(key);
 		List dataKey = redisHandler.opsForList().range(zsetKey, 0, -1);
 		int index=1;

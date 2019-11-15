@@ -50,8 +50,9 @@ public class RedisCaffeineCacheManager implements CacheManager {
 	@Override
 	public Cache getCache(String name) {
 		long expiration=0;
-		if(name.contains("#")){
-			String[] split = name.split("#");
+		String splitCode = codeFocusRedisProperties.getCacheConfig().getSplitCode();
+		if(name.contains(splitCode)){
+			String[] split = name.split(splitCode);
 			if(split.length>1){
 				try{
 					String value = split[1];
