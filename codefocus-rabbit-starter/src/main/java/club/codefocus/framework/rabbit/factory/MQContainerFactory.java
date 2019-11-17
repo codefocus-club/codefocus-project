@@ -12,7 +12,7 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.util.StringUtils;
 /**
- * @Auther: jackl
+ * @author  jackl
  * @Date: 2019/10/21 16:21
  * @Description:
  */

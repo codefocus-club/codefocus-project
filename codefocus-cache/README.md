@@ -72,7 +72,7 @@ spring:
 ### (step 4)注解详解：
 
     /**
-     * @Auther: jackl
+     * @author  jackl
      * @Date: 2019/10/25 10:26
      * @Description:分布式锁开关
      */

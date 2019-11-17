@@ -3,7 +3,7 @@ package club.codefocus.framework.rabbit.enums;
 
 import org.springframework.amqp.core.*;
 /**
- * @Auther: jackl
+ * @author  jackl
  * @Date: 2019/10/21 16:21
  * @Description:
  */

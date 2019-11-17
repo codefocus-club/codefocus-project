@@ -3,7 +3,7 @@ package club.codefocus.framework.cache.exception;
 import lombok.Data;
 
 /**
- * @Auther: jackl
+ * @author  jackl
  * @Date: 2019/10/25 14:03
  * @Description:
  */

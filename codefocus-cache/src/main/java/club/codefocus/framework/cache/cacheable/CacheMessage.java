@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- * @Auther: jackl
+ * @author  jackl
  * @Date: 2019/11/13 13:10
  * @Description:
  */

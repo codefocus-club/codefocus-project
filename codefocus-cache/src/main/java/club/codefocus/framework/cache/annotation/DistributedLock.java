@@ -3,7 +3,7 @@ package club.codefocus.framework.cache.annotation;
 import java.lang.annotation.*;
 
 /**
- * @Auther: jackl
+ * @author  jackl
  * @Date: 2019/10/25 10:26
  * @Description:分布式锁开关
  */

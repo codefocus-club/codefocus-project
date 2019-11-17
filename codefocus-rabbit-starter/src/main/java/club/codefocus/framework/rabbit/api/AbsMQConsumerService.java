@@ -8,9 +8,7 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import java.io.IOException;
 
 /**
- * @Auther: jackl
- * @Date: 2019/10/21 16:21
- * @Description:
+ * @author  jackl
  */
 public abstract class AbsMQConsumerService implements MQConsumerService {
     private volatile boolean end = false;

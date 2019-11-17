@@ -28,7 +28,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.io.Serializable;
 
 /**
- * @Auther: jackl
+ * @author  jackl
  * @Date: 2019/10/25 10:26
  * @Description:
  */

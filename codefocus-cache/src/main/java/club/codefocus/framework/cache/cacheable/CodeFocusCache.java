@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * @Auther: jackl
+ * @author  jackl
  * @Date: 2019/11/13 13:10
  * @Description:
  */
