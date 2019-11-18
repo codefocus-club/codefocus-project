@@ -6,12 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * 随机生成IP
- * ClassName: IpUtils <br/>
- * Function:
- * Reason:IpUtils
- * date: 2019/10/25 10:37<br/>
- * @author jackl
+ * @author  jackl
+ * @since 1.0
  */
 @Slf4j
 public class IpUtils {

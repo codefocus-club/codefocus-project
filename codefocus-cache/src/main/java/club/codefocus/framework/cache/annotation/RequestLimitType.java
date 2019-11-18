@@ -1,10 +1,8 @@
 package club.codefocus.framework.cache.annotation;
 
 /**
- * @ClassName: LockType
- * @Description:锁类型
- * @author: jackl
- * @date: 2019/10/25 10:26
+ * @author  jackl
+ * @since 1.0
  */
 public enum RequestLimitType {
     /**

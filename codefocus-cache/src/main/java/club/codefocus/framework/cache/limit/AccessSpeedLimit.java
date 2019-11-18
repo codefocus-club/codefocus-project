@@ -10,11 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 分布式速率限制 例如:限制n秒钟请求x次
- * @ClassName: AccessSpeedLimit
- * @Description:
- * @author: jackl
- * @date: 2019/10/25 10:26
+ * @author  jackl
+ * @since 1.0
  */
 @Slf4j
 public class AccessSpeedLimit {
@@ -26,13 +23,6 @@ public class AccessSpeedLimit {
     }
 
 
-    /**
-     * 针对资源key,每seconds秒最多访问maxCount次,超过maxCount次返回false
-     * @param key
-     * @param seconds
-     * @param limitCount
-     * @return
-     */
     public boolean tryAccess(String key, int seconds, int limitCount) {
         LimitRule limitRule = new LimitRule();
         limitRule.setLimitCount(limitCount);

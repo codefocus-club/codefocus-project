@@ -4,8 +4,7 @@ import lombok.Data;
 
 /**
  * @author  jackl
- * @Date: 2019/10/25 14:03
- * @Description:
+ * @since 1.0
  */
 @Data
 public class RedisStarterDataView  {

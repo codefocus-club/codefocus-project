@@ -2,12 +2,9 @@ package club.codefocus.framework.cache.exception;
 
 /**
  * @author  jackl
- * @date 2019/10/25 10:26
+ * @since 1.0
  */
 public enum RedisStarterExceptionEnum {
-    /**
-     * 服务异常
-     */
     SERVER_METHOD_LOCKED (500102, "该方法正在执行,请勿重复操作"),
     SERVER_LIMIT_EXCEPTION (500101, "服务压力承载过大,稍后重试"),
     SERVER__EXCEPTION (500000, "服务异常"),
@@ -26,15 +23,8 @@ public enum RedisStarterExceptionEnum {
         return code;
     }
 
-    public void setCode(Integer code) {
-        this.code = code;
-    }
-
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }

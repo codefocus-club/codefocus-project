@@ -3,12 +3,8 @@ package club.codefocus.framework.cache.limit;
 import lombok.Data;
 
 /**
- * 限制规则
- *
- * @ClassName: LimitRule
- * @Description:
- * @author: jackl
- * @date: 2019/10/25 10:26
+ * @author  jackl
+ * @since 1.0
  */
 @Data
 public class LimitRule {

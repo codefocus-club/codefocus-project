@@ -2,8 +2,7 @@ package club.codefocus.framework.cache.annotation;
 
 /**
  * @author  jackl
- * @Date: 2019/10/25 10:26
- * @Description:锁类型
+ * @since 1.0
  */
 public enum LockType {
     /**

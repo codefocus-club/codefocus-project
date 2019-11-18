@@ -25,10 +25,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @ClassName: RequestLimitInterceptor
- * @Description:单位时间内限流拦截器，根据@RequestLimit判断
- * @author: jackl
- * @date: 2019/10/25 10:26
+ * @author  jackl
+ * @since 1.0
  */
 @Slf4j
 public class RequestLimitInterceptor extends HandlerInterceptorAdapter {

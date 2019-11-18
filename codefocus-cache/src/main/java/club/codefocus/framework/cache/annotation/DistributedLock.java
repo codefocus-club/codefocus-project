@@ -4,8 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * @author  jackl
- * @Date: 2019/10/25 10:26
- * @Description:分布式锁开关
+ * @since 1.0
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
