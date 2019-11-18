@@ -11,6 +11,7 @@ import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.data.redis.core.TimeoutUtils;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -91,7 +92,7 @@ public class CodeFocusCacheManager implements CacheManager {
 
 	@Override
 	public Collection<String> getCacheNames() {
-		return null;
+		return Collections.unmodifiableSet(this.cacheMap.keySet());
 	}
 
 	public CaffeineCache caffeineCache(String name, long expiration){
