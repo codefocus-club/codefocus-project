@@ -6,9 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.List;
 
 /**
- * @Auther= jackl
- * @Date= 2019/10/24 10=28
- * @Description=
+ * @auther jackl
  */
 @Data
 @ConfigurationProperties(prefix="spring.rabbitmq.dynamic-message")

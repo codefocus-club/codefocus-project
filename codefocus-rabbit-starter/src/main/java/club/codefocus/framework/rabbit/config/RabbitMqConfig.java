@@ -16,8 +16,6 @@ import java.util.List;
 
 /**
  * @author  jackl
- * @Date: 2019/10/21 16:21
- * @Description:
  */
 @Slf4j
 @ComponentScan("club.codefocus.framework.rabbit")

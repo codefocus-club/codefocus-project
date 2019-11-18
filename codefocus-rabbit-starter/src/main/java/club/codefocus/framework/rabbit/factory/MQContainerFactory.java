@@ -13,8 +13,6 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.util.StringUtils;
 /**
  * @author  jackl
- * @Date: 2019/10/21 16:21
- * @Description:
  */
 @Slf4j
 @Data

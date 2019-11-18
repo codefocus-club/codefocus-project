@@ -27,29 +27,10 @@ public class MQDynamicHandler {
     @Autowired
     ApplicationContextHelper applicationContextHelper;
 
-    /**
-     * 将消息发送到指定的交换器上
-     * @param exchange
-     * @param routingKey
-     * @param msg
-     */
     public void publishMsg(String exchange, String routingKey, Object msg) {
         amqpTemplate.convertAndSend(exchange, routingKey, msg);
     }
 
-    /**
-     *
-     * @param beanName
-     * @param exchangeName
-     * @param queueName
-     * @param routingKey
-     * @param autoDelete
-     * @param durable
-     * @param acknowledgeMode
-     * @param exchangeType
-     * @return
-     * @throws Exception
-     */
     public void consumerGenerate(String beanName,String exchangeName, String queueName, String routingKey, boolean autoDelete, boolean durable,
                                  String acknowledgeMode, EnumsExchangeType exchangeType) throws Exception {
         Object bean = applicationContextHelper.getBean(beanName);

@@ -1,6 +1,6 @@
 package club.codefocus.framework.trace;
 
-import org.apache.dubbo.rpc.RpcContext;
+import org.slf4j.MDC;
 
 import java.util.UUID;
 
@@ -15,6 +15,6 @@ public class TraceIdUtil {
     }
 
     public static String get() {
-        return RpcContext.getContext().getAttachment(TraceConstant.TRACE_KEY);
+        return MDC.get(TraceConstant.TRACE_KEY);
     }
 }
