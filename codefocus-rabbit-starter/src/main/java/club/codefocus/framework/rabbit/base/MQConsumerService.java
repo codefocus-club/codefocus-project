@@ -3,7 +3,7 @@ package club.codefocus.framework.rabbit.base;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 /**
- * @Auther: jackl
+ * @author  jackl
  * @Date: 2019/10/21 16:21
  * @Description:
  */

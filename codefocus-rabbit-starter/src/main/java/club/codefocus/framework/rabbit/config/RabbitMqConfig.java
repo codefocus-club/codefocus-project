@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 /**
- * @Auther: jackl
+ * @author  jackl
  * @Date: 2019/10/21 16:21
  * @Description:
  */

@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Auther: jackl
+ * @author  jackl
  * @Date: 2019/11/13 13:10
  * @Description:
  */

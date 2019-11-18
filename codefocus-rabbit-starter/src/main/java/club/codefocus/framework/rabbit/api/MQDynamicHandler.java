@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * @Auther: jackl
- * @Date: 2019/10/23 17:07
- * @Description:
+ * @author  jackl
  */
 @Component
 public class MQDynamicHandler {

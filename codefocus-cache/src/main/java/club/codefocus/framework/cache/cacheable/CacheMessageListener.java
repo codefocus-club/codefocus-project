@@ -8,7 +8,7 @@ import org.springframework.data.redis.connection.MessageListener;
 
 
 /**
- * @Auther: jackl
+ * @author  jackl
  * @Date: 2019/11/13 13:10
  * @Description:
  */

@@ -1,7 +1,7 @@
 package club.codefocus.framework.cache.exception;
 
 /**
- * @Auther: jackl
+ * @author  jackl
  * @date 2019/10/25 10:26
  */
 public enum RedisStarterExceptionEnum {

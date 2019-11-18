@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.lang.Thread.sleep;
 /**
- * @Auther: jackl
+ * @author  jackl
  * @Date: 2019/10/25 10:37
  * @Description:
  */
