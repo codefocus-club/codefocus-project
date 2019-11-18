@@ -40,6 +40,11 @@
         <redis.clients.version>2.9.0</redis.clients.version>
         <commons-pool2.version>2.6.1</commons-pool2.version>
         <fastjson.version>1.2.41</fastjson.version>
+        <dubbo.version>2.7.1</dubbo.version>
+        <org.slf4j.version>1.7.25</org.slf4j.version>
+        <javax.servlet.version>4.0.1</javax.servlet.version>
+
+        <org.spring.web-mvc.version>5.1.5.RELEASE</org.spring.web-mvc.version>
     </properties>
 
 
@@ -95,6 +100,28 @@
                 <version>${commons-pool2.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo</artifactId>
+                <version>${dubbo.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${org.slf4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc</artifactId>
+                <version>${org.spring.web-mvc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>${javax.servlet.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 </project>

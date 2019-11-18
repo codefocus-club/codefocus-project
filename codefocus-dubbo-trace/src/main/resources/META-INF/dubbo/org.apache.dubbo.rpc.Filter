@@ -1,0 +1,1 @@
+dubboTraceIdFilter=club.codefocus.framework.trace.filter.DubboTransferTraceIdFilter

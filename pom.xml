@@ -12,9 +12,10 @@
         <module>codefocus-parent</module>
         <module>codefocus-rabbit-starter</module>
         <module>codefocus-cache</module>
+        <module>codefocus-dubbo-trace</module>
     </modules>
     <properties>
-        <revision>1.0.1-SNAPSHOT</revision>
+        <revision>1.0-SNAPSHOT</revision>
     </properties>
     <name>codefocus-project</name>
     <description>致力于打造简单快捷高效可用的基础组件以及服务</description>
