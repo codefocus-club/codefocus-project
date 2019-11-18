@@ -34,9 +34,12 @@ public class WebProduceTraceIdFilter implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("remove traceIdFilter");
+        try{
+        }finally {
+            MDC.remove(TraceConstant.TRACE_KEY);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.info("traceId clear");
+            }
         }
-        MDC.remove(TraceConstant.TRACE_KEY);
     }
 }
