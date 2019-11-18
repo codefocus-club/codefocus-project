@@ -34,9 +34,26 @@ spring:
       global-limit-count: 200  #次数
       global-limit-period-time: 1 #毫秒  单位时间内的次数
       global-limit-open: true #是否开启服务限流 
-
+      cache-config:  #缓存配置
+              cache-null-values: true #是否允许为Null
+              cache-base-name: demo   #项目名称,缓存key的前缀
+              split-code: #     #拆分符合
+              caffeine:
+                initial-capacity: 1  #初始值
+                maximum-size: 2  #最大值
 ```
+##Spring Cacheable 添加过期时间
 
+    #拆分符 支持自定义
+        
+    @Cacheable(value = "UserInfoList#30s" ,key = "#p0")
+            UserInfoList:
+            30s
+            s:秒
+            m:分钟
+            h：小时
+            d：天
+     
 
 ##使用教程：
 
@@ -157,14 +174,6 @@ spring:
         @RequestLimit(limit = 1,period =1 ,unit = TimeUnit.SECONDS)
         
     
-##Spring Cacheable 添加过期时间
-        
-    @Cacheable(value = "UserInfoList#30s" ,key = "#p0")
-            UserInfoList:
-            30s
-            s:秒
-            m:分钟
-            h：小时
-            d：天
+            
 
 
