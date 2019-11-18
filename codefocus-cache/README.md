@@ -32,7 +32,7 @@ spring:
     timeout: 2000
     code-focus:
       global-limit-count: 200  #次数
-      global-limit-period-time: 1 #毫秒  单位时间内的次数
+      global-limit-period-time: 1 #秒  单位时间内的次数
       global-limit-open: true #是否开启服务限流 
       cache-config:  #缓存配置
               cache-null-values: true #是否允许为Null
