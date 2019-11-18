@@ -5,14 +5,8 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * @Title: RequestLimit
- * @Description: 限制方法调用次数（可以注解在方法或类）
- * @ProjectName:
- * @author: jackl
- * @date: 2019/10/25 10:26
- * @version: V1.0.0
- *  使用列子 接口
- *  @RequestLimit(limit = 3,period =1 ,unit = TimeUnit.MINUTES)
+ * @author  jackl
+ * @since 1.0
  */
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

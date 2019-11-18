@@ -20,8 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author  jackl
- * @Date: 2019/11/13 13:10
- * @Description:
+ * @since 1.0
  */
 @Slf4j
 public class CodeFocusCache extends AbstractValueAdaptingCache {

@@ -30,10 +30,8 @@ import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @ClassName: DistributedLockMethodAop
- * @Description:
- * @author: jackl
- * @date: 2019/10/25 10:26
+ * @author  jackl
+ * @since 1.0
  */
 @Slf4j
 @Aspect

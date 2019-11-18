@@ -9,11 +9,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @ClassName: RedisReentrantLock
- * @Description: redis 分布式锁
- * @author: jackl
- * @date: 2018年5月20日 上午7:56:14
- * @Copyright: 智者开黑
+ * @author  jackl
+ * @since 1.0
  */
 public class RedisReentrantLock implements DistributedReentrantLock {
 

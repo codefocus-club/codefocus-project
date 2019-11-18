@@ -17,8 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author  jackl
- * @Date: 2019/11/13 13:10
- * @Description:
+ * @since 1.0
  */
 @Slf4j
 public class CodeFocusCacheManager implements CacheManager {

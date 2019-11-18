@@ -19,10 +19,8 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- * @ClassName: GlobalLimitInterceptor
- * @Description: 接口限流校验
- * @author: jackl
- * @date: 2019/10/25 10:26
+ * @author  jackl
+ * @since 1.0
  */
 @Slf4j
 public class GlobalLimitInterceptor extends HandlerInterceptorAdapter {

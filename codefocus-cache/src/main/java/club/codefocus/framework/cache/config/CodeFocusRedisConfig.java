@@ -29,8 +29,7 @@ import java.io.Serializable;
 
 /**
  * @author  jackl
- * @Date: 2019/10/25 10:26
- * @Description:
+ * @since 1.0
  */
 @Slf4j
 @EnableCaching  //开启缓存
@@ -97,12 +96,6 @@ public class CodeFocusRedisConfig extends CachingConfigurerSupport implements We
         return redisMessageListenerContainer;
     }
 
-    /**
-     * 自定义缓存key生成策略
-     * 使用方法 @Cacheable(keyGenerator="keyGenerator")
-     *
-     * @return
-     */
     @Bean
     @Override
     public KeyGenerator keyGenerator() {

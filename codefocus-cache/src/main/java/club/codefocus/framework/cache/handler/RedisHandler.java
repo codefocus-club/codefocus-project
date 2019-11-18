@@ -11,8 +11,7 @@ import java.util.concurrent.TimeUnit;
 import static java.lang.Thread.sleep;
 /**
  * @author  jackl
- * @Date: 2019/10/25 10:37
- * @Description:
+ * @since 1.0
  */
 @Slf4j
 public class RedisHandler<K,V> extends RedisTemplate<K,V>{

@@ -5,9 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * @Auther= jackl
- * @Date= 2019/10/24 10=28
- * @Description=
+ * @author  jackl
+ * @since 1.0
  */
 @Data
 @ConfigurationProperties(prefix="spring.redis.code-focus")
