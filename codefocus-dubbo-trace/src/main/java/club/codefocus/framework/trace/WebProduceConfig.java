@@ -1,6 +1,7 @@
 package club.codefocus.framework.trace;
 
 import club.codefocus.framework.trace.filter.WebProduceTraceIdFilter;
+import club.codefocus.framework.trace.properties.DubboTraceProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

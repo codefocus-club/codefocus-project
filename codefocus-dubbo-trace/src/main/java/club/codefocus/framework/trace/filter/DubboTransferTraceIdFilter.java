@@ -24,8 +24,12 @@ public class DubboTransferTraceIdFilter implements Filter {
         // traceId来源 web容器设置、非web容器
         String traceId = rpcContext.getAttachment(TraceConstant.TRACE_KEY);
         if (traceId == null) {
-            //重新生成
-            traceId = TraceIdUtil.generate();
+            if (MDC.get(TraceConstant.TRACE_KEY) != null) {
+                traceId = MDC.get(TraceConstant.TRACE_KEY);
+            }else {
+                //重新生成
+                traceId = TraceIdUtil.generate();
+            }
         }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("DubboTraceIdFilter traceId={}", traceId);
