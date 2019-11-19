@@ -2,11 +2,11 @@
 
 ## 亮点：
 
-        1.采用UUID策略生成traceId
-        
-        2.支持定义生成TraceId
-        
-        3.主异线程切换TraceId不丢失
+1. 采用UUID策略生成traceId
+
+2. 支持定义生成TraceId
+
+3. 主异线程切换TraceId不丢失
         
 
 ## 环境依赖：
@@ -15,11 +15,11 @@
 ## 使用教程：
 ### (step 1) 引入依赖
 ```xml
-    <dependency>
-        <groupId>club.codefocus.framework</groupId>
-        <artifactId>codefocus-dubbo-trace</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
-    </dependency>
+<dependency>
+    <groupId>club.codefocus.framework</groupId>
+    <artifactId>codefocus-dubbo-trace</artifactId>
+    <version>1.0.1-SNAPSHOT</version>
+</dependency>
 
 ```
             
@@ -42,7 +42,7 @@ TraceIdUtil.traceId() 获取分布式TraceId
             
   ###### xml获取traceId的方式：
   ```xml
-            %X{codefocus-trace}
+  %X{codefocus-trace}
   ```           
   ###### logback-spring.xml：    
  ```xml
@@ -54,11 +54,11 @@ TraceIdUtil.traceId() 获取分布式TraceId
 ```
             
 ## 主异线程切换TraceId不丢失配置
-MDC使用的是ThreadLocal实现 子线程无法传递mdc值 可以配置MdcThreadPoolTaskExecutor实现mdc值传递（ **默认启用** ）
+MDC使用的是ThreadLocal实现 子线程无法传递mdc值 可以配置MdcThreadPoolTaskExecutor实现mdc值传递（**默认启用**）
     
 ```yaml
 # 默认使用spring.task.execution配置 配置示例
- spring: 
+spring: 
   task:
     execution:
       core-pool-size: 80
