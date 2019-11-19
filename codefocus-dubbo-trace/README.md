@@ -12,6 +12,7 @@
             </dependency>
             
 ### (step 2)YML配置详解：
+
             dubbo:
               provider:
                 filter: dubboTraceIdFilter
@@ -19,14 +20,16 @@
                 filter: dubboTraceIdFilter
                 
 ### (step 3)TraceIdUtil：
+
             TraceIdUtil.traceId() 获取分布式TraceId    
                             
 ### (step 3) logback-spring.xml || logback.xml：
             
-  ######xml获取traceId的方式：
+  ###### xml获取traceId的方式：
+  
             %X{codefocus-trace}
              
-  ######logback-spring.xml：    
+  ###### logback-spring.xml：    
   
              <?xml version="1.0" encoding="UTF-8"?>
              <configuration>

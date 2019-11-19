@@ -27,7 +27,7 @@ public class MdcTaskExecutionAutoConfiguration {
     @ConfigurationProperties(prefix = "spring.task.execution")
     @ConditionalOnBean
     public Executor asyncExecutor() {
-        log.info("mdcThreadPoolTaskExecutor init");
+        log.debug("mdcThreadPoolTaskExecutor init");
         ThreadPoolTaskExecutor executor = new MdcThreadPoolTaskExecutor();
         executor.setThreadNamePrefix("code-focus-executor-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
