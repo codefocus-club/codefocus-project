@@ -21,6 +21,7 @@ public class DubboTransferTraceIdFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation){
         RpcContext rpcContext = RpcContext.getContext();
+        Result result =null;
         try{
             // traceId来源 web容器设置、非web容器
             String traceId = rpcContext.getAttachment(TraceConstant.TRACE_KEY);
@@ -39,17 +40,17 @@ public class DubboTransferTraceIdFilter implements Filter {
             rpcContext.setAttachment(TraceConstant.TRACE_KEY, traceId);
             //设置mdc 用于日志打印
             MDC.put(TraceConstant.TRACE_KEY, traceId);
-            Result result = invoker.invoke(invocation);
-
+            result = invoker.invoke(invocation);
             if (rpcContext.isConsumerSide()) {
                 LOGGER.debug(" consumer :{}"+traceId);
             }
             if(rpcContext.isProviderSide()){
                 LOGGER.debug(" provider :{}"+traceId);
             }
-
-            return result;
-        }finally {
+        }catch (Exception e){
+            e.printStackTrace();
+            LOGGER.error(e.getMessage());
+        } finally{
             if (rpcContext.isProviderSide()) {
                 //provider端调用完毕收移除mdc值 server端保留
                 MDC.remove(TraceConstant.TRACE_KEY);
@@ -58,6 +59,7 @@ public class DubboTransferTraceIdFilter implements Filter {
                 }
             }
         }
+        return result;
     }
 
     @Override

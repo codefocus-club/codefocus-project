@@ -23,7 +23,7 @@ public class WebProduceTraceIdFilter implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("entry traceIdFilter");
+            LOGGER.debug("entry traceIdFilter  url:{}",request.getRequestURL());
         }
         String traceId = TraceIdUtil.generate();
         RpcContext rpcContext = RpcContext.getContext();
