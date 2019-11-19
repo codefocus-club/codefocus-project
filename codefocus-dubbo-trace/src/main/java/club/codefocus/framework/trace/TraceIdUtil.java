@@ -14,7 +14,7 @@ public class TraceIdUtil {
         return UUID.randomUUID().toString().replace("-", "").toUpperCase();
     }
 
-    public static String get() {
+    public static String traceId() {
         return MDC.get(TraceConstant.TRACE_KEY);
     }
 }
