@@ -1,8 +1,23 @@
 # codefocus-cache 基于YML动态配置Redis
 
+
+## 亮点:
+
+        1.批量更新时,不使用Keys命令,提升Redis性能
+        
+        2.支持动态自定义缓存自动过期时间
+        
+        3.支持DistributedLock  分布式锁
+        
+        4.支持RequestLimit   接口限流
+        
+        5.支持服务限流
+        
+
+
 ## 环境依赖：
     springboot 2.1.3.RELEASE 版本
-    
+            
 ### (step 1)使用教程：
 ```xml
 

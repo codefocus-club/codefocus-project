@@ -1,5 +1,14 @@
 # codefocus-rabbit-starter 基于YML动态配置创建Rabbit
 
+
+## 亮点：
+
+        1.动态创建rabbit
+        
+        2.支持自定义配置
+        
+        
+        
 ## 环境依赖：
     springboot 2.1.3.RELEASE 版本
     

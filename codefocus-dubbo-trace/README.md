@@ -1,5 +1,14 @@
 # codefocus-dubbo-trace 自定义分布式TraceId
 
+## 亮点：
+
+        1.采用UUID策略生成traceId
+        
+        2.支持定义生成TraceId
+        
+        3.主异线程切换TraceId不丢失
+        
+
 ## 环境依赖：
     springboot 2.1.3.RELEASE 版本
     
