@@ -37,7 +37,7 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 
 	private String topic;
 
-	private Map<String, ReentrantLock> keyLockMap = new ConcurrentHashMap<String, ReentrantLock>();
+	private Map<Object, ReentrantLock> keyLockMap = new ConcurrentHashMap<Object, ReentrantLock>();
 
 
 	CodeFocusRedisProperties codeFocusRedisProperties;
@@ -86,7 +86,7 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 		ReentrantLock lock = keyLockMap.get(key);
 		if(lock == null) {
 			lock = new ReentrantLock();
-			keyLockMap.putIfAbsent(key.toString(), lock);
+			keyLockMap.putIfAbsent(key, lock);
 		}
 		try {
 			lock.lock();
@@ -112,11 +112,11 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 			this.evict(key);
             return;
         }
-		String dataKey = getKey(key).toString();
-		String dataValue = toStoreValue(value).toString();
+		Object dataKey = getKey(key);
+		Object dataValue = toStoreValue(value);
 		addCache(this.name,dataKey,dataKey,dataValue);
 
-		push(this.name, getKey(key).toString());
+		push(this.name, getKey(key));
 
 		caffeineCache.put(dataKey, toStoreValue(value));
 	}
@@ -128,10 +128,10 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 		Object prevValue = null;
 		// 考虑使用分布式锁，或者将redis的setIfAbsent改为原子性操作
 		synchronized (key) {
-			prevValue = redisHandler.find(cacheKey.toString());
+			prevValue = redisHandler.find(cacheKey);
 			if(prevValue == null) {
-				String dataKey = getKey(key).toString();
-				String dataValue = toStoreValue(value).toString();
+				Object dataKey = getKey(key);
+				Object dataValue = toStoreValue(value);
 				addCache(this.name,dataKey,dataKey,dataValue);
 				push(this.name, dataKey);
 				caffeineCache.put(cacheKey, toStoreValue(value));
@@ -145,7 +145,7 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 	public void evict(Object key) {
 		log.debug("evict; key:{}",key);
 		// 先清除redis中缓存数据，然后清除caffeine中的缓存，避免短时间内如果先清除caffeine缓存后其他请求会再从redis里加载到caffeine中
-		String dataKey = getKey(key).toString();
+		Object dataKey = getKey(key);
 		redisHandler.remove(dataKey);
 		push(this.name, dataKey);
 		caffeineCache.evict(key);
@@ -178,7 +178,7 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 		}catch (Exception e){
 			log.error(e.getMessage());
 		}
-		value=redisHandler.find(cacheKey.toString());
+		value=redisHandler.find(cacheKey);
 		log.debug("lookup; cacheKey:{},value:{};expiration:{}",cacheKey,value,expiration);
 		if(value != null) {
 			caffeineCache.put(cacheKey, value);
@@ -193,7 +193,7 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 	/**
 	 * 缓存变更时通知其他节点清理本地缓存
 	 */
-	private void push(String name, String dataKey) {
+	private void push(String name, Object dataKey) {
 		CacheMessage cacheMessage=new CacheMessage();
 		cacheMessage.setKey(dataKey);
 		cacheMessage.setCacheName(name);
@@ -232,7 +232,7 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 	 * @param dataKey
 	 * @param dataValue
 	 */
-	public void addCache(String key, Object value, String dataKey, String dataValue) {
+	public void addCache(String key, Object value, Object dataKey, Object dataValue) {
 
 		key=key.split(codeFocusRedisProperties.getCacheConfig().getSplitCode())[0];
 
@@ -249,11 +249,11 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 		sbu.append("  redis.call('expire', KEYS[2], ARGV[4])");
 		sbu.append("\n end ");
 		DefaultRedisScript LOCK_LUA_SCRIPT = new DefaultRedisScript<>(sbu.toString());
-		List<String> keys =new ArrayList<>();
+		List<Object> keys =new ArrayList<>();
 		keys.add(dataKey);
 		keys.add(zsetKey);
 		log.debug("addCache  key:{},value:{},dataKey:{},dataValue:{},expiration:{}",key,value,dataKey,dataValue,expiration);
-		redisHandler.execute(LOCK_LUA_SCRIPT,keys,dataValue,expiration,String.valueOf(value),expiration);
+		redisHandler.execute(LOCK_LUA_SCRIPT,keys,dataValue,expiration,value,expiration);
 
 	}
 

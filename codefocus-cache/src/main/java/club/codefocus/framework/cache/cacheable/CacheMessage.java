@@ -18,11 +18,10 @@ public class CacheMessage implements Serializable {
 
 	private String cacheName;
 
-	private String key;
+	private Object key;
 
 	public CacheMessage(){
 	}
-
 
 	public CacheMessage(String json) {
 		try {
