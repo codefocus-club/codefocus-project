@@ -32,7 +32,7 @@
 
             TraceIdUtil.traceId() 获取分布式TraceId    
                             
-### (step 3) logback-spring.xml || logback.xml：
+### (step 4) logback-spring.xml || logback.xml：
             
   ###### xml获取traceId的方式：
   
