@@ -17,7 +17,7 @@ public class MdcThreadPoolTaskExecutor extends ThreadPoolTaskExecutor {
     private boolean useFixedContext = false;
     private Map<String, String> fixedContext;
 
-    MdcThreadPoolTaskExecutor() {
+    public MdcThreadPoolTaskExecutor() {
         super();
     }
 
