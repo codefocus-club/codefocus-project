@@ -60,6 +60,7 @@ spring:
 ##Spring Cacheable 添加过期时间
 
     #拆分符 支持自定义
+```java
         
     @Cacheable(value = "UserInfoList#30s" ,key = "#p0")
             UserInfoList:
@@ -68,11 +69,14 @@ spring:
             m:分钟
             h：小时
             d：天
-     
+            
+```     
 
 ##使用教程：
 
 ### (step 3)Bean实例详解：
+
+```java
 
     @Resource
     RedisHandler redisHandler;
@@ -100,8 +104,11 @@ spring:
          */
         public void unlock(String key)
     
+```
   
 ### (step 4)注解详解：
+
+```java
 
     /**
      * @author  jackl
@@ -189,6 +196,6 @@ spring:
         @RequestLimit(limit = 1,period =1 ,unit = TimeUnit.SECONDS)
         
     
-            
+ ```          
 
 
