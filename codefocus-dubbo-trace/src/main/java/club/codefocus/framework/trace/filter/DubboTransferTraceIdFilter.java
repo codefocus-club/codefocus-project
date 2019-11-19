@@ -55,7 +55,7 @@ public class DubboTransferTraceIdFilter implements Filter {
                 //provider端调用完毕收移除mdc值 server端保留
                 MDC.remove(TraceConstant.TRACE_KEY);
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.info("traceId clear");
+                    LOGGER.debug("traceId clear");
                 }
             }
         }
@@ -78,7 +78,7 @@ public class DubboTransferTraceIdFilter implements Filter {
             //provider端调用完毕收移除mdc值 server端保留
             MDC.remove(TraceConstant.TRACE_KEY);
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.info("traceId clear");
+                LOGGER.debug("traceId clear");
             }
         }
     }

@@ -1,4 +1,4 @@
-# codefocus-redis-starter 基于YML动态配置Redis
+# codefocus-cache 基于YML动态配置Redis
 
 ## 环境依赖：
     springboot 2.1.3.RELEASE 版本
@@ -6,11 +6,11 @@
 ### (step 1)使用教程：
 ```xml
 
-<dependency>
-    <groupId>club.codefocus.framework</groupId>
-    <artifactId>codefocus-redis-starter</artifactId>
-    <version>1.0-SNAPSHOT</version>
- </dependency>
+    <dependency>
+        <groupId>club.codefocus.framework</groupId>
+        <artifactId>codefocus-cache</artifactId>
+        <version>1.0.1-SNAPSHOT</version>
+    </dependency>
 
 ```
 
