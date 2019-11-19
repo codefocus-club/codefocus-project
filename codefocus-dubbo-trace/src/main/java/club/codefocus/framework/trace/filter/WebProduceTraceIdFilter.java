@@ -38,7 +38,7 @@ public class WebProduceTraceIdFilter implements HandlerInterceptor {
         }finally {
             MDC.remove(TraceConstant.TRACE_KEY);
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.info("traceId clear");
+                LOGGER.debug("traceId clear");
             }
         }
     }

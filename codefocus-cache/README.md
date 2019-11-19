@@ -1,16 +1,31 @@
-# codefocus-redis-starter 基于YML动态配置Redis
+# codefocus-cache 基于YML动态配置Redis
+
+
+## 亮点:
+
+        1.批量更新时,不使用Keys命令,提升Redis性能
+        
+        2.支持动态自定义缓存自动过期时间
+        
+        3.支持DistributedLock  分布式锁
+        
+        4.支持RequestLimit   接口限流
+        
+        5.支持服务限流
+        
+
 
 ## 环境依赖：
     springboot 2.1.3.RELEASE 版本
-    
+            
 ### (step 1)使用教程：
 ```xml
 
-<dependency>
-    <groupId>club.codefocus.framework</groupId>
-    <artifactId>codefocus-redis-starter</artifactId>
-    <version>1.0-SNAPSHOT</version>
- </dependency>
+    <dependency>
+        <groupId>club.codefocus.framework</groupId>
+        <artifactId>codefocus-cache</artifactId>
+        <version>1.0.1-SNAPSHOT</version>
+    </dependency>
 
 ```
 
@@ -44,8 +59,12 @@ spring:
 ```
 ##Spring Cacheable 添加过期时间
 
+    
+```java
+    
     #拆分符 支持自定义
-        
+    
+    
     @Cacheable(value = "UserInfoList#30s" ,key = "#p0")
             UserInfoList:
             30s
@@ -53,11 +72,14 @@ spring:
             m:分钟
             h：小时
             d：天
-     
+            
+```     
 
 ##使用教程：
 
 ### (step 3)Bean实例详解：
+
+```java
 
     @Resource
     RedisHandler redisHandler;
@@ -85,8 +107,11 @@ spring:
          */
         public void unlock(String key)
     
+```
   
 ### (step 4)注解详解：
+
+```java
 
     /**
      * @author  jackl
@@ -174,6 +199,6 @@ spring:
         @RequestLimit(limit = 1,period =1 ,unit = TimeUnit.SECONDS)
         
     
-            
+ ```          
 
 
