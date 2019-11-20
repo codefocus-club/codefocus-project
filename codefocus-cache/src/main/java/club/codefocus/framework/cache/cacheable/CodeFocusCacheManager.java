@@ -78,6 +78,9 @@ public class CodeFocusCacheManager implements CacheManager {
 					log.error(e.getMessage());
 				}
 			}
+		}else{
+			expiration=TimeoutUtils.toSeconds(1, TimeUnit.DAYS);
+			log.debug("getCache no split name:{};expiration:{}",name,expiration);
 		}
 		Cache cache = cacheMap.get(name);
 		if(cache != null) {
