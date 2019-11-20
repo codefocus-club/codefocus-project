@@ -52,7 +52,7 @@ spring:
       cache-config:  #缓存配置
           cache-null-values: true #是否允许为Null
           cache-base-name: demo   #项目名称,缓存key的前缀
-          split-code: #     #拆分符合
+          split-code: '#'     #拆分符合
           caffeine:
             initial-capacity: 1  #初始值
             maximum-size: 2  #最大值
