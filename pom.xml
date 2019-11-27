@@ -18,7 +18,7 @@
         <revision>1.0.1-SNAPSHOT</revision>
     </properties>
     <name>codefocus-project</name>
-    <description>致力于打造简单快捷高效可用的基础组件以及服务</description>
+    <description>Committed to building simple, fast and efficient basic components and services</description>
     <url>http://codefocus.club/</url>
     <licenses>
         <license>
