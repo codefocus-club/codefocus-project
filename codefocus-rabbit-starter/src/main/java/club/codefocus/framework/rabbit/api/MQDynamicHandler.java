@@ -8,11 +8,9 @@ import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -41,12 +39,18 @@ public class MQDynamicHandler implements ApplicationContextAware, CommandLineRun
 
     public void consumerGenerate(String beanName,String exchangeName, String queueName, String routingKey, boolean autoDelete, boolean durable,
                                 String acknowledgeMode, EnumsExchangeType exchangeType) throws Exception {
-        Object bean = this.getBean(beanName);
-        log.info("consumerGenerate:{}",bean);
+        AbsMQConsumerService absMQConsumerService=null;
+        try {
+            Object bean = this.getBean(beanName);
+            absMQConsumerService=(AbsMQConsumerService) bean;
+            log.debug("consumerGenerate:{}",bean);
+        }catch (Exception e){
+            log.debug("consumer bean is null");
+        }
         MQContainerFactory fac =
                 MQContainerFactory.builder().directExchange(exchangeName).queue(queueName).autoDeleted(autoDelete)
                         .acknowledgeMode(acknowledgeMode).durable(durable).routingKey(routingKey).rabbitAdmin(rabbitAdmin)
-                        .connectionFactory(connectionFactory).consumer((AbsMQConsumerService) bean).exchangeType(exchangeType).build();
+                        .connectionFactory(connectionFactory).absMQConsumerService(absMQConsumerService).exchangeType(exchangeType).build();
         fac.getObject();
     }
 

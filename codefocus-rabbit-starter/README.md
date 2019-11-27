@@ -33,7 +33,6 @@ spring:
         port: 5672
         username: guest
         password: guest
-        #consumer
         listener:
           simple:
           #全局配置：公平派遣消息-消费者无应答并发消费数，默认为循环派遣

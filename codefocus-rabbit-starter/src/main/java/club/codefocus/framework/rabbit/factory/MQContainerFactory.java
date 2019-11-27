@@ -37,7 +37,7 @@ public class MQContainerFactory implements FactoryBean<SimpleMessageListenerCont
     private Integer concurrentNum;
     private Integer prefetchCount;
     // 消费方
-    private AbsMQConsumerService consumer;
+    private AbsMQConsumerService absMQConsumerService;
 
 
     private String listenerId;
@@ -117,8 +117,8 @@ public class MQContainerFactory implements FactoryBean<SimpleMessageListenerCont
         }else{
             container.setAcknowledgeMode(AcknowledgeMode.NONE);
         }
-        if (consumer != null) {
-            container.setMessageListener(consumer);
+        if (absMQConsumerService != null) {
+            container.setMessageListener(absMQConsumerService);
             container.start();
             this.listenerId = container.getListenerId();
             log.info("queue:{};listenerId:{}",queue,listenerId);
