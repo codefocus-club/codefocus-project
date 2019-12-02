@@ -34,6 +34,7 @@ public class GlobalLimitInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
         boolean globalLimitOpen = redisProperties.isGlobalLimitOpen();
+        log.debug("globalLimitOpen:{};",globalLimitOpen);
         if(globalLimitOpen){
             if (handler instanceof HandlerMethod) {
                 HandlerMethod handlerMethod = (HandlerMethod) handler;
@@ -42,6 +43,7 @@ public class GlobalLimitInterceptor extends HandlerInterceptorAdapter {
                 if (StringUtils.isNotBlank(ip) && StringUtils.isNotBlank(methodName)) {
                     AccessSpeedLimit accessSpeedLimit = new AccessSpeedLimit(limitRedisTemplate);
                     if (!accessSpeedLimit.tryAccess(ip, redisProperties.getGlobalLimitPeriodTime(), redisProperties.getGlobalLimitCount())) {
+                        log.debug("globalLimitOpen:{};globalLimitPeriodTime:{}",globalLimitOpen,redisProperties.getGlobalLimitPeriodTime());
                         try {
                             RedisStarterDataView redisStarterDataView= new RedisStarterDataView(RedisStarterExceptionEnum.SERVER_LIMIT_EXCEPTION);
                             response.setContentType("application/json;charset=UTF-8");

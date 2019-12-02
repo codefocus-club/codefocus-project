@@ -15,7 +15,7 @@
         <module>codefocus-dubbo-trace</module>
     </modules>
     <properties>
-        <revision>1.0.1-SNAPSHOT</revision>
+        <revision>1.0.2-SNAPSHOT</revision>
     </properties>
     <name>codefocus-project</name>
     <description>Committed to building simple, fast and efficient basic components and services</description>
