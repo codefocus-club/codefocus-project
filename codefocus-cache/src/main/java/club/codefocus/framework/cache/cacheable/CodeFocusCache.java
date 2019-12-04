@@ -128,7 +128,7 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 		Object prevValue = null;
 		// 考虑使用分布式锁，或者将redis的setIfAbsent改为原子性操作
 		synchronized (key) {
-			prevValue = redisHandler.find(cacheKey);
+			prevValue=findRedisCache(cacheKey);
 			if(prevValue == null) {
 				Object dataKey = getKey(key);
 				Object dataValue = toStoreValue(value);
@@ -146,12 +146,9 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 		log.debug("evict; key:{}",key);
 		// 先清除redis中缓存数据，然后清除caffeine中的缓存，避免短时间内如果先清除caffeine缓存后其他请求会再从redis里加载到caffeine中
 		Object dataKey = getKey(key);
-		redisHandler.remove(dataKey);
+		removeRedisCache(dataKey);
 		push(this.name, dataKey);
 		caffeineCache.evict(key);
-		String zsetKey = getZsetKey(this.name.split(codeFocusRedisProperties.getCacheConfig().getSplitCode())[0]);
-		log.debug("evict zsetKey:{},dataKey:{}",zsetKey,dataKey);
-		redisHandler.opsForList().remove(zsetKey,0,dataKey);
 	}
 
 	@Override
@@ -178,16 +175,12 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 		}catch (Exception e){
 			log.error(e.getMessage());
 		}
-		value=redisHandler.find(cacheKey);
+		value=findRedisCache(cacheKey);
 		log.debug("lookup; cacheKey:{},value:{};expiration:{}",cacheKey,value,expiration);
 		if(value != null) {
 			caffeineCache.put(cacheKey, value);
 		}
 		return value;
-	}
-
-	private Object getKey(Object key) {
-		return cachePrefix.concat(":").concat(name+":").concat(key.toString()).concat(":");
 	}
 
 	/**
@@ -221,8 +214,20 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 			caffeineCache.evict(key);
 		}
 	}
-	String getZsetKey(String name){
-		return cachePrefix.concat(":").concat(name).concat(":");
+
+
+	private Object getKey(Object key) {
+		String soltKey = name.split(codeFocusRedisProperties.getCacheConfig().getSplitCode())[0];
+		String concat = "{"+soltKey+"}"+cachePrefix.concat(":").concat(name + ":").concat(key.toString()).concat(":");
+		log.debug("getKey concat:{}",concat);
+		return concat;
+	}
+
+	private String getZsetKey(String name){
+		String soltKey = name.split(codeFocusRedisProperties.getCacheConfig().getSplitCode())[0];
+		String concat =  "{"+soltKey+"}"+cachePrefix.concat(":").concat(soltKey).concat(":");
+		log.debug("getZsetKey concat:{},name:{},splitCode:{}",concat,soltKey,codeFocusRedisProperties.getCacheConfig().getSplitCode());
+		return concat;
 	}
 
 	/**
@@ -233,16 +238,11 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 	 * @param dataValue
 	 */
 	public void addCache(String key, Object value, Object dataKey, Object dataValue) {
-
-		key=key.split(codeFocusRedisProperties.getCacheConfig().getSplitCode())[0];
-
 		StringBuilder sbu=new StringBuilder();
 		sbu.append("redis.call('set',KEYS[1],ARGV[1]);");
 		sbu.append("redis.call('expire', KEYS[1], ARGV[2]);");
 		String zsetKey = getZsetKey(key);
 		sbu.append("redis.call('lpush',KEYS[2],ARGV[3]);");
-
-
 		sbu.append("local c = redis.call('ttl',KEYS[2])");
 		sbu.append("\n if tonumber(c) > tonumber(ARGV[4]) then");
 		sbu.append("\n else ");
@@ -252,7 +252,7 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 		List<Object> keys =new ArrayList<>();
 		keys.add(dataKey);
 		keys.add(zsetKey);
-		log.debug("addCache  key:{},value:{},dataKey:{},dataValue:{},expiration:{}",key,value,dataKey,dataValue,expiration);
+		log.debug("addCache  zsetKey:{},value:{},dataKey:{},dataValue:{},expiration:{}",zsetKey,value,dataKey,dataValue,expiration);
 		redisHandler.execute(LOCK_LUA_SCRIPT,keys,dataValue,expiration,value,expiration);
 
 	}
@@ -262,7 +262,7 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 	 * @param key
 	 */
 	public void clearRedisData(String key){
-		key=key.split(codeFocusRedisProperties.getCacheConfig().getSplitCode())[0];
+		log.debug("clearRedisData key:{}",key);
 		String zsetKey = getZsetKey(key);
 		List dataKey = redisHandler.opsForList().range(zsetKey, 0, -1);
 		int index=1;
@@ -288,4 +288,18 @@ public class CodeFocusCache extends AbstractValueAdaptingCache {
 		log.debug("clearRedisData keys:{},zsetKey:{}",keys.size(),sbu.toString());
 		redisHandler.execute(LOCK_LUA_SCRIPT,keys);
 	}
+
+	public Object findRedisCache(Object cacheKey){
+		return redisHandler.find(cacheKey);
+	}
+
+	public void removeRedisCache(Object dataKey){
+		log.debug("removeRedisCache dataKey:{}",dataKey);
+		redisHandler.remove(dataKey);
+
+		String zsetKey = getZsetKey(this.name.split(codeFocusRedisProperties.getCacheConfig().getSplitCode())[0]);
+		log.debug("removeRedisCache zsetKey:{},dataKey:{}",zsetKey,dataKey);
+		redisHandler.opsForList().remove(zsetKey,0,dataKey);
+	}
+
 }

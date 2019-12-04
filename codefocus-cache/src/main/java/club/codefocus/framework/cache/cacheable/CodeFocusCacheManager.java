@@ -51,12 +51,16 @@ public class CodeFocusCacheManager implements CacheManager {
 	public Cache getCache(String name) {
 		long expiration=0;
 		String splitCode = codeFocusRedisProperties.getCacheConfig().getSplitCode();
+		log.debug("splitCode:{}",splitCode);
 		if(name.contains(splitCode)){
 			String[] split = name.split(splitCode);
 			if(split.length>1){
 				try{
 					String value = split[1];
-					expiration=Integer.parseInt(value.replaceAll("[^0-9]",""));
+					log.debug("value:{}",value);
+					String s = value.replaceAll("[^0-9]", "");
+					log.debug("expirationStr:{}",s);
+					expiration=Integer.parseInt(s);
 					String unitStr = value.replaceAll("[^a-zA-z]","");
 					log.debug("getCache unistr:{};expiration:{};value:{}",unitStr,expiration,value);
 					TimeUnit unit=TimeUnit.SECONDS;
@@ -75,6 +79,7 @@ public class CodeFocusCacheManager implements CacheManager {
 					expiration=TimeoutUtils.toSeconds(expiration, unit);
 					log.debug("getCache unistr:{};expiration:{};value:{}",unitStr,expiration,value);
 				}catch (Exception e){
+					e.printStackTrace();
 					log.error(e.getMessage());
 				}
 			}

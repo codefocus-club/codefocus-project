@@ -50,6 +50,7 @@ public class GlobalLimitInterceptor extends HandlerInterceptorAdapter {
                             ObjectMapper objectMapper=new ObjectMapper();
                             response.getWriter().print(objectMapper.writeValueAsString(redisStarterDataView));
                         } catch (IOException e) {
+                            log.error(e.getMessage());
                         }
                         return false;
                     }
