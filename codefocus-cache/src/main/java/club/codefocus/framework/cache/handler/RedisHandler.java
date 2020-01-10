@@ -74,7 +74,7 @@ public class RedisHandler<K,V> extends RedisTemplate<K,V>{
                 break;
             }
             try {
-                sleep(500);
+                sleep(510);
             } catch (InterruptedException e) {
                 log.error("key:{};time:{};message:{}",key,time,e.getMessage());
             }
