@@ -44,7 +44,7 @@
         <org.slf4j.version>1.7.25</org.slf4j.version>
         <javax.servlet.version>4.0.1</javax.servlet.version>
 
-        <org.spring.web-mvc.version>5.1.5.RELEASE</org.spring.web-mvc.version>
+        <org.spring.web-mvc.version>5.2.0.RELEASE</org.spring.web-mvc.version>
     </properties>
 
 
