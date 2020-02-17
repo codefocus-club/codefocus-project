@@ -1,11 +1,25 @@
 
 # codefocus-project
  
-    致力于打造简单快捷高效可用的基础组件以及服务
+    致力于打造开源简单快捷高效可用的基础组件以及服务
     
 # 最新版本：
     version：1.0.1-SNAPSHOT
     
+# 仓库地址：
+
+     <repository>
+        <id>oss-snapshots</id>
+        <name>Nexus</name>
+        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        <releases>
+            <enabled>false</enabled>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+     </repository> 
+        
 ## 基础组件结构
     1. codefocus-rabbit-starter 基于YML动态配置创建Rabbit 
         简介：

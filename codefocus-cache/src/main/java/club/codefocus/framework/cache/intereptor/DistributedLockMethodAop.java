@@ -1,11 +1,8 @@
 package club.codefocus.framework.cache.intereptor;
 
 import club.codefocus.framework.cache.annotation.DistributedLock;
-import club.codefocus.framework.cache.exception.RedisStarterDataView;
-import club.codefocus.framework.cache.exception.RedisStarterExceptionEnum;
 import club.codefocus.framework.cache.lock.RedisReentrantLock;
 import club.codefocus.framework.cache.util.IpUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -25,7 +22,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
@@ -78,13 +74,7 @@ public class DistributedLockMethodAop {
                         retVal = pjp.proceed();
                     } else {
                         log.debug("获取分布式锁超时,锁已被占用:{}", lockName);
-                        try {
-                            RedisStarterDataView redisStarterDataView= new RedisStarterDataView(RedisStarterExceptionEnum.SERVER_METHOD_LOCKED);
-                            response.setContentType("application/json;charset=UTF-8");
-                            ObjectMapper objectMapper=new ObjectMapper();
-                            response.getWriter().print(objectMapper.writeValueAsString(redisStarterDataView));
-                        } catch (IOException e) {
-                        }
+                        throw new Exception("该方法正在执行,请勿重复操作");
                     }
                 } catch (Exception e) {
                     throw e;

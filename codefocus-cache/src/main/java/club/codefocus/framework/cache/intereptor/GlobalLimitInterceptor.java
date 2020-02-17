@@ -1,11 +1,8 @@
 package club.codefocus.framework.cache.intereptor;
 
-import club.codefocus.framework.cache.exception.RedisStarterDataView;
-import club.codefocus.framework.cache.exception.RedisStarterExceptionEnum;
 import club.codefocus.framework.cache.limit.AccessSpeedLimit;
 import club.codefocus.framework.cache.properties.CodeFocusRedisProperties;
 import club.codefocus.framework.cache.util.IpUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +12,6 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -32,7 +28,7 @@ public class GlobalLimitInterceptor extends HandlerInterceptorAdapter {
     RedisTemplate<String, Serializable>  limitRedisTemplate;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         boolean globalLimitOpen = redisProperties.isGlobalLimitOpen();
         log.debug("globalLimitOpen:{};",globalLimitOpen);
         if(globalLimitOpen){
@@ -43,16 +39,8 @@ public class GlobalLimitInterceptor extends HandlerInterceptorAdapter {
                 if (StringUtils.isNotBlank(ip) && StringUtils.isNotBlank(methodName)) {
                     AccessSpeedLimit accessSpeedLimit = new AccessSpeedLimit(limitRedisTemplate);
                     if (!accessSpeedLimit.tryAccess(ip, redisProperties.getGlobalLimitPeriodTime(), redisProperties.getGlobalLimitCount())) {
-                        log.debug("globalLimitOpen:{};globalLimitPeriodTime:{}",globalLimitOpen,redisProperties.getGlobalLimitPeriodTime());
-                        try {
-                            RedisStarterDataView redisStarterDataView= new RedisStarterDataView(RedisStarterExceptionEnum.SERVER_LIMIT_EXCEPTION);
-                            response.setContentType("application/json;charset=UTF-8");
-                            ObjectMapper objectMapper=new ObjectMapper();
-                            response.getWriter().print(objectMapper.writeValueAsString(redisStarterDataView));
-                        } catch (IOException e) {
-                            log.error(e.getMessage());
-                        }
-                        return false;
+                        log.error("globalLimitOpen:{};globalLimitPeriodTime:{}",globalLimitOpen,redisProperties.getGlobalLimitPeriodTime());
+                        throw new Exception("服务压力承载过大,稍后重试,或请调整服务配额");
                     }
                 }
             }

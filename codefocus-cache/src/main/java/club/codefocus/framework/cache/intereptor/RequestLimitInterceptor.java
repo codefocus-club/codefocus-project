@@ -2,12 +2,8 @@ package club.codefocus.framework.cache.intereptor;
 
 import club.codefocus.framework.cache.annotation.RequestLimit;
 import club.codefocus.framework.cache.annotation.RequestLimitType;
-import club.codefocus.framework.cache.exception.RedisStarterDataView;
-import club.codefocus.framework.cache.exception.RedisStarterExceptionEnum;
 import club.codefocus.framework.cache.handler.RedisHandler;
 import club.codefocus.framework.cache.util.IpUtils;
-import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +16,6 @@ import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -37,8 +32,7 @@ public class RequestLimitInterceptor extends HandlerInterceptorAdapter {
     private RedisHandler redisHandler;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-            {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (handler instanceof HandlerMethod) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             RequestLimit requestLimit = AnnotationUtils.findAnnotation(handlerMethod.getMethod(), RequestLimit.class);
@@ -65,14 +59,7 @@ public class RequestLimitInterceptor extends HandlerInterceptorAdapter {
                     Long countNum = NumberUtils.toLong(cacheValue.toString());
                     if (countNum >= limit) {
                         redisHandler.increment(cacheKey, period, unit);
-                        try {
-                            RedisStarterDataView redisStarterDataView= new RedisStarterDataView(RedisStarterExceptionEnum.RQUESTLIMITEXC_EPTION);
-                            response.setContentType("application/json;charset=UTF-8");
-                            ObjectMapper objectMapper=new ObjectMapper();
-                            response.getWriter().print(objectMapper.writeValueAsString(redisStarterDataView));
-                        } catch (IOException e) {
-                        }
-                        return false;
+                        throw new Exception("接口访问频繁,稍后重试");
                     }
                 }
                 redisHandler.increment(cacheKey, period, unit);
