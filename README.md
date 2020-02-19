@@ -21,6 +21,7 @@
      </repository> 
         
 ## 基础组件结构
+
     1. codefocus-rabbit-starter 基于YML动态配置创建Rabbit 
         简介：
             基于rabbit动态创建rabbit和消费rabbit
@@ -28,8 +29,10 @@
             1.动态创建rabbit
             2.支持自定义配置
         具体操作：
-            codefocus-rabbit-starter  readme.md            
-    2. codefocus-cache 动态集成
+            codefocus-rabbit-starter  readme.md   
+                     
+    2. codefocus-cache 基于YML动态配置Redis，集成Spring Cache，增加二级缓存caffeine，优化keys及scan命令，过期时间扩展，使用方式和Spring Cache完全一样，支持其它更多的功能
+    
         简介：
             基于caffeine和redis的一级缓存和二级缓存同步
         亮点:
@@ -42,6 +45,7 @@
             经测试,比只使用Redis要提升2倍之多
         具体操作：
             详见codefocus-cache  readme.md
+            
     3. codefocus-dubbo-trace 自定义分布式链路追踪traceId
         简介：
             自定义分布式链路追踪traceId

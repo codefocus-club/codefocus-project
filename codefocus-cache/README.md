@@ -1,4 +1,4 @@
-# codefocus-cache 基于YML动态配置Redis
+# codefocus-cache 基于YML动态配置Redis，集成Spring Cache，增加二级缓存caffeine，优化keys及scan命令，过期时间扩展，使用方式和Spring Cache完全一样，支持其它更多的功能
 
 
 ## 亮点:
