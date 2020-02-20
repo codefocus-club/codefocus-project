@@ -20,7 +20,7 @@
         </snapshots>
      </repository> 
         
-## 基础组件结构
+## 基础组件介绍
 
     1. codefocus-rabbit-starter 基于YML动态配置创建Rabbit 
         简介：
