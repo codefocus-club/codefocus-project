@@ -18,7 +18,7 @@
 <dependency>
     <groupId>club.codefocus.framework</groupId>
     <artifactId>codefocus-dubbo-trace</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
 </dependency>
 
 ```
