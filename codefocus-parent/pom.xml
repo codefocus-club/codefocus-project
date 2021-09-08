@@ -40,7 +40,7 @@
         <redis.clients.version>2.9.0</redis.clients.version>
         <commons-pool2.version>2.6.1</commons-pool2.version>
         <fastjson.version>1.2.41</fastjson.version>
-        <dubbo.version>2.7.1</dubbo.version>
+        <dubbo.version>2.7.13</dubbo.version>
         <org.slf4j.version>1.7.25</org.slf4j.version>
         <javax.servlet.version>4.0.1</javax.servlet.version>
 
